@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Agent">
+<title>Personal Agent</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0F1117;--surface:#181C27;--card:#1E2333;--border:#2A3045;
+  --accent:#F5A623;--accent-dim:#3A2E10;--text:#E8EAF0;--muted:#6B7592;
+  --danger:#E05C5C;--success:#4CAF87;--purple:#8B7CF6;--blue:#4A9EF5;
+  --work:#4A9EF5;--personal:#8B7CF6;--investing:#4CAF87;
+  --safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* Topbar */
+#topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:calc(var(--safe-top)+10px) 16px 10px;flex-shrink:0}
+.topbar-row1{display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:17px;font-weight:800;letter-spacing:-.5px}.logo span{color:var(--accent)}
+.date-chip{font-size:11px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 10px}
+.topbar-row2{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.mode-toggle{display:flex;background:var(--card);border-radius:20px;padding:3px;gap:2px;border:1px solid var(--border)}
+.mode-btn{padding:5px 12px;border-radius:16px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);-webkit-tap-highlight-color:transparent}
+.mode-btn.active{background:var(--accent);color:#111}
+.meta-chips{display:flex;gap:6px}
+.meta-chip{font-size:11px;color:var(--muted)}
+
+/* Content */
+#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.panel{display:none;padding:14px;padding-bottom:calc(80px + var(--safe-bottom));min-height:100%}
+.panel.active{display:block}
+
+/* Tabbar */
+#tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);z-index:100}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 4px;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;font-weight:600;transition:color .15s;-webkit-tap-highlight-color:transparent}
+.tab-btn.active{color:var(--accent)}
+.tab-btn svg{width:21px;height:21px}
+
+/* API screen */
+#apiscreen{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
+#apiscreen h2{font-size:22px;font-weight:800;margin-bottom:8px;text-align:center}
+#apiscreen p{color:var(--muted);font-size:14px;text-align:center;line-height:1.5;margin-bottom:24px}
+#apiscreen input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;font-family:monospace}
+#apiscreen input:focus{border-color:var(--accent)}
+.primary-btn{width:100%;background:var(--accent);color:#111;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer}
+#apiscreen .skip{color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;cursor:pointer;text-align:center}
+#apiscreen .note{font-size:11px;color:var(--muted);margin-top:18px;text-align:center;line-height:1.6}
+
+/* Section headers */
+.section-hdr{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin:18px 0 8px}
+.section-hdr:first-child{margin-top:0}
+
+/* Morning briefing */
+#briefing-panel{background:linear-gradient(135deg,#1a1f35 0%,#0F1117 100%);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+.briefing-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.briefing-title{font-size:15px;font-weight:700}
+.briefing-btn{background:var(--accent);color:#111;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.briefing-btn:disabled{opacity:.5}
+.briefing-content{font-size:14px;color:var(--text);line-height:1.65;white-space:pre-wrap}
+.briefing-empty{font-size:13px;color:var(--muted);text-align:center;padding:6px 0}
+
+/* Today items */
+.today-event{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:7px}
+.event-bar{width:3px;height:32px;background:var(--purple);border-radius:2px;flex-shrink:0}
+.event-body .event-title{font-size:14px;font-weight:600}
+.event-body .event-time{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Filter row */
+.filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-btn{padding:5px 13px;border-radius:20px;border:none;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;background:var(--card);color:var(--muted);-webkit-tap-highlight-color:transparent}
+.filter-btn.active{background:var(--accent);color:#111}
+
+/* Quick add */
+.quick-add{display:flex;gap:8px;margin-bottom:12px}
+.quick-add input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;font-family:inherit}
+.quick-add input:focus{border-color:var(--accent)}
+.quick-add button{background:var(--accent);color:#111;border:none;border-radius:12px;padding:0 18px;font-weight:700;font-size:20px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+/* Task form */
+.task-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px}
+.task-form input,.task-form select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit;margin-bottom:8px;appearance:none;-webkit-appearance:none}
+.task-form input:focus,.task-form select:focus{border-color:var(--accent)}
+.task-form select option{background:var(--surface)}
+.form-row{display:flex;gap:8px}
+.form-row>*{flex:1}
+.form-btns{display:flex;gap:8px;margin-top:6px}
+.form-btn{flex:1;padding:11px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.form-btn.primary{background:var(--accent);color:#111}
+.form-btn.secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+
+/* Category pill selector inside form */
+.cat-selector{display:flex;gap:6px;margin-bottom:8px}
+.cat-pill{padding:7px 14px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:transparent;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.cat-pill.work{color:var(--work)}.cat-pill.work.sel{background:var(--work);color:#fff;border-color:var(--work)}
+.cat-pill.personal{color:var(--personal)}.cat-pill.personal.sel{background:var(--personal);color:#fff;border-color:var(--personal)}
+.cat-pill.investing{color:var(--investing)}.cat-pill.investing.sel{background:var(--investing);color:#fff;border-color:var(--investing)}
+
+/* Tag selector in form */
+.tag-selector-wrap{margin-bottom:8px}
+.tag-selector-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.tag-pills{display:flex;flex-wrap:wrap;gap:6px}
+.tag-pick-pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--muted);-webkit-tap-highlight-color:transparent;transition:all .15s}
+.tag-pick-pill.sel{background:var(--accent);color:#111;border-color:var(--accent)}
+.tag-add-inline{display:flex;gap:6px;margin-top:6px}
+.tag-add-inline input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;font-family:inherit}
+.tag-add-inline input:focus{border-color:var(--accent)}
+.tag-add-inline button{background:var(--card);border:1px solid var(--border);color:var(--accent);border-radius:8px;padding:0 12px;font-size:18px;cursor:pointer}
+
+/* Todo items */
+.todo-item{display:flex;align-items:flex-start;gap:10px;padding:12px 13px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:7px;transition:opacity .2s}
+.todo-item.done{opacity:.35;background:transparent;border-color:transparent}
+.check-btn{width:22px;height:22px;border-radius:6px;border:2px solid var(--muted);background:transparent;cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.check-btn.checked{background:var(--success);border-color:var(--success)}
+.todo-body{flex:1;min-width:0}
+.todo-title-row{font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.todo-title-row.strikethrough{text-decoration:line-through;color:var(--muted)}
+.priority-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.todo-meta{display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap}
+.cat-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid}
+.cat-badge.work{color:var(--work);border-color:var(--work)}
+.cat-badge.personal{color:var(--personal);border-color:var(--personal)}
+.cat-badge.investing{color:var(--investing);border-color:var(--investing)}
+.tag-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.todo-due{font-size:11px;color:var(--muted)}
+.todo-due.overdue{color:var(--danger)}
+.recurring-badge{font-size:10px;color:var(--muted)}
+.del-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.empty-state{text-align:center;color:var(--muted);margin-top:50px;font-size:14px;line-height:2}
+
+/* Tags Management Panel */
+.tags-section{margin-bottom:24px}
+.tags-cat-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tags-cat-dot{width:10px;height:10px;border-radius:50%}
+.tags-cat-label{font-size:14px;font-weight:700}
+.tags-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.manage-tag{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 12px}
+.manage-tag span{font-size:13px;font-weight:500}
+.manage-tag button{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;padding:0;-webkit-tap-highlight-color:transparent}
+.add-tag-row{display:flex;gap:8px}
+.add-tag-row input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
+.add-tag-row input:focus{border-color:var(--accent)}
+.add-tag-row button{background:var(--accent);color:#111;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:18px;cursor:pointer}
+
+/* Calendar */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-nav{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 16px;font-size:18px;cursor:pointer}
+.cal-title{font-size:16px;font-weight:700}
+.cal-daynames{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.cal-dayname{text-align:center;font-size:11px;color:var(--muted);font-weight:600;padding-bottom:4px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-cell{min-height:50px;border-radius:10px;padding:5px 4px;cursor:pointer;background:var(--card);border:1px solid var(--border);-webkit-tap-highlight-color:transparent}
+.cal-cell.empty{background:transparent;border-color:transparent;cursor:default}
+.cal-cell.today{border-color:var(--accent)}
+.cal-cell.selected{background:var(--accent-dim);border-color:var(--accent)}
+.cal-day-num{font-size:13px;font-weight:500}
+.cal-cell.today .cal-day-num{color:var(--accent);font-weight:700}
+.cal-dots{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap}
+.cal-dot{width:5px;height:5px;border-radius:50%;background:var(--purple)}
+.day-detail{margin-top:12px;background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border)}
+.day-detail-title{font-weight:700;font-size:14px;margin-bottom:10px}
+.event-item{display:flex;gap:10px;align-items:center;background:var(--surface);border-radius:10px;padding:10px 12px;margin-bottom:7px}
+.event-item .event-bar{width:3px;height:36px;background:var(--purple);border-radius:2px;flex-shrink:0}
+.event-item .event-body{flex:1}
+.event-item .event-title{font-size:14px;font-weight:600}
+.event-item .event-time{font-size:12px;color:var(--muted);margin-top:2px}
+.event-item .event-note{font-size:12px;color:var(--muted);margin-top:2px}
+.event-add-form{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.event-add-form input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
+.event-add-form input:focus{border-color:var(--accent)}
+.event-add-form button{background:var(--accent);color:#111;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:15px;cursor:pointer}
+
+/* Chat */
+#chat-messages{display:flex;flex-direction:column;gap:10px;padding-bottom:16px}
+.msg{display:flex}.msg.user{justify-content:flex-end}
+.bubble{max-width:82%;padding:11px 15px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.msg.user .bubble{background:var(--accent);color:#111;border-radius:18px 18px 4px 18px;font-weight:500}
+.msg.assistant .bubble{background:var(--card);color:var(--text);border-radius:18px 18px 18px 4px;border:1px solid var(--border)}
+#chat-input-wrap{position:fixed;bottom:calc(58px + var(--safe-bottom));left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 12px;display:flex;gap:8px;z-index:99}
+#chat-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:11px 16px;color:var(--text);font-size:15px;outline:none;font-family:inherit;resize:none;max-height:100px;overflow-y:auto}
+#chat-input:focus{border-color:var(--accent)}
+#send-btn{width:44px;height:44px;border-radius:22px;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end}
+#send-btn:disabled{opacity:.4}
+
+/* Toast */
+#toast{position:fixed;top:calc(var(--safe-top)+70px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--success);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- API Key Screen -->
+<div id="apiscreen">
+  <div style="font-size:36px;margin-bottom:16px">◆</div>
+  <h2>Personal Agent</h2>
+  <p>Enter your Anthropic API key to enable AI features. Tasks & calendar work without it.</p>
+  <input type="password" id="api-key-input" placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false">
+  <button class="primary-btn" onclick="saveApiKey()">Get Started</button>
+  <div class="skip" onclick="skipApiKey()">Skip — use tasks & calendar only</div>
+  <div class="note">Stored only on this device · ~₹5–10/month for personal use<br>Get a key at console.anthropic.com</div>
+</div>
+
+<div id="app">
+  <div id="topbar">
+    <div class="topbar-row1">
+      <div class="logo"><span>◆</span> Personal Agent</div>
+      <div class="date-chip" id="top-date"></div>
+    </div>
+    <div class="topbar-row2">
+      <div class="mode-toggle">
+        <button class="mode-btn active" onclick="setMode('all',this)">All</button>
+        <button class="mode-btn" onclick="setMode('work',this)">Work</button>
+        <button class="mode-btn" onclick="setMode('personal',this)">Personal</button>
+        <button class="mode-btn" onclick="setMode('investing',this)">Investing</button>
+      </div>
+      <div class="meta-chips">
+        <div class="meta-chip" id="meta-tasks">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="content">
+    <!-- Today -->
+    <div class="panel active" id="panel-today">
+      <div id="briefing-panel">
+        <div class="briefing-header">
+          <div class="briefing-title">☀️ Morning Briefing</div>
+          <button class="briefing-btn" id="briefing-btn" onclick="generateBriefing()">Generate</button>
+        </div>
+        <div id="briefing-content"><div class="briefing-empty">Tap Generate for your AI daily briefing</div></div>
+      </div>
+      <div class="section-hdr">Due Today & Overdue</div>
+      <div id="today-tasks"></div>
+      <div class="section-hdr">Today's Events</div>
+      <div id="today-events"></div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="panel" id="panel-tasks">
+      <div class="quick-add">
+        <input type="text" id="quick-task-input" placeholder="Quick add task…" autocomplete="off">
+        <button onclick="toggleTaskForm()">+</button>
+      </div>
+      <div id="task-form-wrap" style="display:none">
+        <div class="task-form">
+          <input type="text" id="tf-title" placeholder="Task title">
+          <!-- Category picker -->
+          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Category</div>
+          <div class="cat-selector" id="cat-selector">
+            <button class="cat-pill work sel" onclick="selectCat('work',this)">💼 Work</button>
+            <button class="cat-pill personal" onclick="selectCat('personal',this)">🏠 Personal</button>
+            <button class="cat-pill investing" onclick="selectCat('investing',this)">📈 Investing</button>
+          </div>
+          <!-- Tag picker — dynamic -->
+          <div class="tag-selector-wrap">
+            <div class="tag-selector-label">Tag (optional)</div>
+            <div class="tag-pills" id="tag-pills"></div>
+            <div class="tag-add-inline">
+              <input type="text" id="inline-tag-input" placeholder="New tag…" autocomplete="off">
+              <button onclick="inlineAddTag()">+</button>
+            </div>
+          </div>
+          <!-- Priority + recurring -->
+          <div class="form-row">
+            <select id="tf-priority">
+              <option value="high">🔴 High</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+            <select id="tf-recurring">
+              <option value="">Not recurring</option>
+              <option value="daily">🔁 Daily</option>
+              <option value="weekly">🔁 Weekly</option>
+            </select>
+          </div>
+          <input type="date" id="tf-due" style="color-scheme:dark">
+          <div class="form-btns">
+            <button class="form-btn secondary" onclick="toggleTaskForm()">Cancel</button>
+            <button class="form-btn primary" onclick="addTaskFromForm()">Add Task</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
+        <button class="filter-btn" onclick="setFilter('done',this)">Done</button>
+        <button class="filter-btn" onclick="setFilter('high',this)">🔴 High</button>
+        <button class="filter-btn" onclick="setFilter('overdue',this)">Overdue</button>
+      </div>
+      <div id="todo-list"></div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="panel" id="panel-calendar">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="calNav(-1)">‹</button>
+        <div class="cal-title" id="cal-title"></div>
+        <button class="cal-nav" onclick="calNav(1)">›</button>
+      </div>
+      <div class="cal-daynames">
+        <div class="cal-dayname">Su</div><div class="cal-dayname">Mo</div>
+        <div class="cal-dayname">Tu</div><div class="cal-dayname">We</div>
+        <div class="cal-dayname">Th</div><div class="cal-dayname">Fr</div>
+        <div class="cal-dayname">Sa</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div id="day-detail"></div>
+    </div>
+
+    <!-- Tags Management -->
+    <div class="panel" id="panel-tags">
+      <div id="tags-manager"></div>
+    </div>
+
+    <!-- Chat -->
+    <div class="panel" id="panel-chat">
+      <div id="chat-messages"></div>
+    </div>
+  </div>
+
+  <div id="chat-input-wrap" style="display:none">
+    <textarea id="chat-input" rows="1" placeholder="Add task, plan meeting, ask anything…"></textarea>
+    <button id="send-btn" onclick="sendChat()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+  <div id="tabbar">
+    <button class="tab-btn active" id="tab-today" onclick="switchTab('today')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      Today
+    </button>
+    <button class="tab-btn" id="tab-tasks" onclick="switchTab('tasks')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tasks
+    </button>
+    <button class="tab-btn" id="tab-calendar" onclick="switchTab('calendar')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Calendar
+    </button>
+    <button class="tab-btn" id="tab-tags" onclick="switchTab('tags')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Tags
+    </button>
+    <button class="tab-btn" id="tab-chat" onclick="switchTab('chat')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Chat
+    </button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const today=new Date(), todayStr=today.toISOString().slice(0,10);
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let todos   = JSON.parse(localStorage.getItem('pa-todos')||'[]');
+let events  = JSON.parse(localStorage.getItem('pa-events')||'[]');
+// tags: { work: ["Deal Flow","Portfolio",...], personal: [...], investing: [...] }
+let tags    = JSON.parse(localStorage.getItem('pa-tags')||'{"work":[],"personal":[],"investing":[]}');
+let apiKey  = localStorage.getItem('pa-apikey')||'';
+let chatHistory=[{role:'assistant',content:'Hi! I\'m your personal agent.\n\nTry:\n• "Add high priority work task: due diligence review by Friday"\n• "Add investing task: review portfolio returns this week"\n• "Schedule LP call June 25 at 4pm"\n• "What should I focus on today?"'}];
+let currentFilter='all', currentMode='all', currentTab='today';
+let calState={year:today.getFullYear(),month:today.getMonth()}, selectedDay=null;
+let isSending=false, showTaskForm=false;
+let selectedCat='work', selectedTag=null;
+
+function uid(){return Math.random().toString(36).slice(2,9)}
+function persist(){
+  localStorage.setItem('pa-todos',JSON.stringify(todos));
+  localStorage.setItem('pa-events',JSON.stringify(events));
+  localStorage.setItem('pa-tags',JSON.stringify(tags));
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('top-date').textContent=today.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  if(apiKey||localStorage.getItem('pa-skipped')) document.getElementById('apiscreen').style.display='none';
+  processDailyRecurring();
+  updateMeta(); renderToday(); renderTodos(); renderCalendar(); renderChat(); renderTagsManager();
+
+  const inp=document.getElementById('chat-input');
+  inp.addEventListener('input',()=>{
+    document.getElementById('send-btn').disabled=!inp.value.trim()||isSending;
+    inp.style.height='auto'; inp.style.height=Math.min(inp.scrollHeight,100)+'px';
+  });
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat()}});
+  document.getElementById('quick-task-input').addEventListener('keydown',e=>{if(e.key==='Enter')quickAddTask()});
+});
+
+// ── API Key ───────────────────────────────────────────────────────────────────
+function saveApiKey(){
+  const v=document.getElementById('api-key-input').value.trim();
+  if(!v){showToast('Paste your API key first');return}
+  apiKey=v; localStorage.setItem('pa-apikey',v);
+  document.getElementById('apiscreen').style.display='none';
+}
+function skipApiKey(){localStorage.setItem('pa-skipped','1');document.getElementById('apiscreen').style.display='none'}
+
+// ── Mode ──────────────────────────────────────────────────────────────────────
+function setMode(mode,btn){
+  currentMode=mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderToday(); renderTodos();
+}
+function modeFilter(arr){
+  if(currentMode==='all') return arr;
+  return arr.filter(t=>t.category===currentMode);
+}
+
+// ── Meta ──────────────────────────────────────────────────────────────────────
+function updateMeta(){
+  const active=modeFilter(todos).filter(t=>!t.done).length;
+  document.getElementById('meta-tasks').textContent=`${active} active`;
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ── Tab ───────────────────────────────────────────────────────────────────────
+function switchTab(tab){
+  currentTab=tab;
+  ['today','tasks','calendar','tags','chat'].forEach(t=>{
+    document.getElementById('panel-'+t).classList.toggle('active',t===tab);
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  document.getElementById('chat-input-wrap').style.display=tab==='chat'?'flex':'none';
+  if(tab==='calendar') renderCalendar();
+  if(tab==='tasks'){renderTodos();refreshTagPills()}
+  if(tab==='today') renderToday();
+  if(tab==='tags') renderTagsManager();
+}
+
+// ── Tags ──────────────────────────────────────────────────────────────────────
+function catColor(cat){return cat==='work'?'var(--work)':cat==='personal'?'var(--personal)':'var(--investing)'}
+function catEmoji(cat){return cat==='work'?'💼':cat==='personal'?'🏠':'📈'}
+
+function renderTagsManager(){
+  const el=document.getElementById('tags-manager');
+  const cats=['work','personal','investing'];
+  el.innerHTML=`<div style="font-size:16px;font-weight:700;margin-bottom:20px">Manage Tags</div>`+
+  cats.map(cat=>`
+    <div class="tags-section">
+      <div class="tags-cat-header">
+        <div class="tags-cat-dot" style="background:${catColor(cat)}"></div>
+        <div class="tags-cat-label">${catEmoji(cat)} ${cap(cat)}</div>
+      </div>
+      <div class="tags-list">
+        ${(tags[cat]||[]).map(tag=>`
+          <div class="manage-tag">
+            <span>${esc(tag)}</span>
+            <button onclick="deleteTag('${cat}','${tag}')" title="Delete">×</button>
+          </div>`).join('')}
+        ${(tags[cat]||[]).length===0?`<div style="font-size:13px;color:var(--muted)">No tags yet</div>`:''}
+      </div>
+      <div class="add-tag-row">
+        <input type="text" id="add-tag-${cat}" placeholder="New ${cat} tag…" autocomplete="off"
+          onkeydown="if(event.key==='Enter')addTag('${cat}')">
+        <button onclick="addTag('${cat}')">+</button>
+      </div>
+    </div>`).join('<div style="height:1px;background:var(--border);margin:8px 0 20px"></div>');
+}
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+function addTag(cat){
+  const inp=document.getElementById(`add-tag-${cat}`);
+  const val=inp.value.trim(); if(!val) return;
+  if(!tags[cat]) tags[cat]=[];
+  if(tags[cat].includes(val)){showToast('Tag already exists');return}
+  tags[cat].push(val);
+  persist(); inp.value=''; renderTagsManager();
+  showToast(`Tag "${val}" added`);
+}
+
+function deleteTag(cat,tag){
+  tags[cat]=(tags[cat]||[]).filter(t=>t!==tag);
+  // Remove tag from existing todos
+  todos=todos.map(t=>t.tag===tag&&t.category===cat?{...t,tag:null}:t);
+  persist(); renderTagsManager(); renderTodos();
+  showToast(`Tag "${tag}" deleted`);
+}
+
+// ── Task form helpers ─────────────────────────────────────────────────────────
+function selectCat(cat,btn){
+  selectedCat=cat; selectedTag=null;
+  document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  refreshTagPills();
+}
+
+function refreshTagPills(){
+  const container=document.getElementById('tag-pills'); if(!container) return;
+  const catTags=tags[selectedCat]||[];
+  container.innerHTML=catTags.map(tag=>`
+    <button class="tag-pick-pill ${selectedTag===tag?'sel':''}" onclick="selectTag('${tag}',this)">${esc(tag)}</button>
+  `).join('');
+}
+
+function selectTag(tag,btn){
+  if(selectedTag===tag){selectedTag=null;btn.classList.remove('sel')}
+  else{selectedTag=tag;document.querySelectorAll('.tag-pick-pill').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel')}
+}
+
+function inlineAddTag(){
+  const inp=document.getElementById('inline-tag-input');
+  const val=inp.value.trim(); if(!val) return;
+  if(!tags[selectedCat]) tags[selectedCat]=[];
+  if(!tags[selectedCat].includes(val)) tags[selectedCat].push(val);
+  selectedTag=val; persist(); inp.value=''; refreshTagPills();
+  showToast(`Tag "${val}" added`);
+}
+
+// ── Task CRUD ─────────────────────────────────────────────────────────────────
+function toggleTaskForm(){
+  showTaskForm=!showTaskForm;
+  document.getElementById('task-form-wrap').style.display=showTaskForm?'block':'none';
+  if(showTaskForm){selectedCat='work';selectedTag=null;refreshTagPills();document.getElementById('tf-title').focus()}
+}
+
+function addTaskFromForm(){
+  const title=document.getElementById('tf-title').value.trim();
+  if(!title){showToast('Enter a task title');return}
+  todos.unshift({
+    id:uid(), title,
+    category: selectedCat,
+    tag: selectedTag||null,
+    priority: document.getElementById('tf-priority').value,
+    recurring: document.getElementById('tf-recurring').value||null,
+    due: document.getElementById('tf-due').value||null,
+    done:false, created:todayStr
+  });
+  persist(); updateMeta(); renderTodos(); renderToday();
+  document.getElementById('tf-title').value='';
+  document.getElementById('tf-due').value='';
+  selectedTag=null; toggleTaskForm();
+  showToast('Task added ✓');
+}
+
+function quickAddTask(){
+  const inp=document.getElementById('quick-task-input');
+  const val=inp.value.trim(); if(!val) return;
+  const cat=currentMode==='all'?'work':currentMode;
+  todos.unshift({id:uid(),title:val,category:cat,tag:null,priority:'medium',recurring:null,due:null,done:false,created:todayStr});
+  inp.value=''; persist(); updateMeta(); renderTodos(); renderToday();
+  showToast('Task added ✓');
+}
+
+function setFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderTodos();
+}
+
+function isOverdue(t){return t.due&&t.due<todayStr&&!t.done}
+
+function renderTodoHTML(t){
+  const dotCol={high:'#E05C5C',medium:'#F5A623',low:'#4CAF87'};
+  const overdue=isOverdue(t);
+  return `<div class="todo-item ${t.done?'done':''}" id="todo-${t.id}">
+    <button class="check-btn ${t.done?'checked':''}" onclick="toggleTodo('${t.id}')">
+      ${t.done?'<svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>':''}
+    </button>
+    <div class="todo-body">
+      <div class="todo-title-row ${t.done?'strikethrough':''}">
+        <span class="priority-dot" style="background:${dotCol[t.priority]||dotCol.medium}"></span>
+        ${esc(t.title)}
+      </div>
+      <div class="todo-meta">
+        <span class="cat-badge ${t.category}">${catEmoji(t.category)} ${cap(t.category)}</span>
+        ${t.tag?`<span class="tag-badge">${esc(t.tag)}</span>`:''}
+        ${t.due?`<span class="todo-due ${overdue?'overdue':''}">${overdue?'⚠ Overdue: ':'Due '}${t.due}</span>`:''}
+        ${t.recurring?`<span class="recurring-badge">🔁 ${t.recurring}</span>`:''}
+      </div>
+    </div>
+    <button class="del-btn" onclick="deleteTodo('${t.id}')">×</button>
+  </div>`;
+}
+
+function renderTodos(){
+  const list=document.getElementById('todo-list');
+  let filtered=modeFilter(todos);
+  if(currentFilter==='active') filtered=filtered.filter(t=>!t.done);
+  else if(currentFilter==='done') filtered=filtered.filter(t=>t.done);
+  else if(currentFilter==='high') filtered=filtered.filter(t=>!t.done&&t.priority==='high');
+  else if(currentFilter==='overdue') filtered=filtered.filter(t=>isOverdue(t));
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state">${currentFilter==='done'?'No completed tasks yet.':'No tasks. Add one above!'}</div>`;
+    return;
+  }
+  list.innerHTML=filtered.map(t=>renderTodoHTML(t)).join('');
+}
+
+function toggleTodo(id){todos=todos.map(t=>t.id===id?{...t,done:!t.done}:t);persist();updateMeta();renderTodos();renderToday()}
+function deleteTodo(id){todos=todos.filter(t=>t.id!==id);persist();updateMeta();renderTodos();renderToday()}
+
+// ── Recurring ─────────────────────────────────────────────────────────────────
+function processDailyRecurring(){
+  const lastRun=localStorage.getItem('pa-last-recurring');
+  if(lastRun===todayStr) return;
+  const toAdd=[];
+  todos.forEach(t=>{
+    if(!t.recurring) return;
+    if(t.recurring==='daily'&&!todos.find(x=>x.title===t.title&&x.due===todayStr&&x.id!==t.id))
+      toAdd.push({...t,id:uid(),done:false,due:todayStr,created:todayStr});
+    if(t.recurring==='weekly'){
+      const diff=Math.floor((new Date()-new Date(t.created))/(864e5));
+      if(diff>=7&&!todos.find(x=>x.title===t.title&&x.due===todayStr&&x.id!==t.id))
+        toAdd.push({...t,id:uid(),done:false,due:todayStr,created:todayStr});
+    }
+  });
+  if(toAdd.length){todos=[...toAdd,...todos];persist()}
+  localStorage.setItem('pa-last-recurring',todayStr);
+}
+
+// ── Today ─────────────────────────────────────────────────────────────────────
+function renderToday(){
+  const filtered=modeFilter(todos);
+  const due=filtered.filter(t=>!t.done&&t.due&&t.due<=todayStr);
+  document.getElementById('today-tasks').innerHTML=due.length
+    ?due.map(t=>renderTodoHTML(t)).join('')
+    :'<div class="empty-state" style="margin-top:8px">No tasks due today 🎉</div>';
+  const todayEvs=events.filter(e=>e.date===todayStr);
+  document.getElementById('today-events').innerHTML=todayEvs.length
+    ?todayEvs.map(ev=>`<div class="today-event"><div class="event-bar"></div><div class="event-body"><div class="event-title">${esc(ev.title)}</div>${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}</div></div>`).join('')
+    :'<div class="empty-state" style="margin-top:8px">No events today</div>';
+}
+
+// ── Morning Briefing ──────────────────────────────────────────────────────────
+async function generateBriefing(){
+  const btn=document.getElementById('briefing-btn');
+  const content=document.getElementById('briefing-content');
+  if(!apiKey){content.innerHTML='<div class="briefing-empty">Add an API key to use AI briefings</div>';return}
+  btn.disabled=true; btn.textContent='Loading…';
+  content.innerHTML='<div class="briefing-empty">Thinking…</div>';
+  const dueTasks=todos.filter(t=>!t.done&&t.due&&t.due<=todayStr);
+  const todayEvs=events.filter(e=>e.date===todayStr);
+  const highP=todos.filter(t=>!t.done&&t.priority==='high').slice(0,5);
+  const ctx=`Today: ${todayStr}
+Due/overdue: ${dueTasks.map(t=>`${t.title} (${t.priority}, ${t.category}${t.tag?'/'+t.tag:''})`).join(', ')||'None'}
+Today's events: ${todayEvs.map(e=>`${e.title}${e.time?' at '+fmtTime(e.time):''}`).join(', ')||'None'}
+High priority tasks: ${highP.map(t=>`${t.title} [${t.category}]`).join(', ')||'None'}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
+        system:'You are a sharp personal assistant. Give a concise morning briefing in 3-4 short prose paragraphs. No bullet points. End with one clear focus recommendation.',
+        messages:[{role:'user',content:`My day:\n${ctx}\n\nGive me a morning briefing.`}]})
+    });
+    const data=await res.json();
+    const text=data.content?.find(b=>b.type==='text')?.text||'Could not generate briefing.';
+    content.innerHTML=`<div class="briefing-content">${esc(text)}</div>`;
+  }catch(e){content.innerHTML='<div class="briefing-empty">Error — check your API key</div>'}
+  btn.disabled=false; btn.textContent='Refresh';
+}
+
+// ── Calendar ──────────────────────────────────────────────────────────────────
+function fmtTime(t){if(!t)return'';const[h,m]=t.split(':').map(Number);return`${(h%12)||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`}
+function calNav(dir){const d=new Date(calState.year,calState.month+dir);calState={year:d.getFullYear(),month:d.getMonth()};selectedDay=null;renderCalendar()}
+function selectDay(ds){selectedDay=selectedDay===ds?null:ds;renderCalendar()}
+
+function renderCalendar(){
+  document.getElementById('cal-title').textContent=`${MONTHS[calState.month]} ${calState.year}`;
+  const first=new Date(calState.year,calState.month,1).getDay();
+  const last=new Date(calState.year,calState.month+1,0).getDate();
+  let html='';
+  for(let i=0;i<first;i++) html+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=last;d++){
+    const ds=`${calState.year}-${String(calState.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evs=events.filter(e=>e.date===ds);
+    html+=`<div class="cal-cell ${ds===todayStr?'today':''} ${selectedDay===ds?'selected':''}" onclick="selectDay('${ds}')">
+      <div class="cal-day-num">${d}</div>
+      ${evs.length?`<div class="cal-dots">${evs.slice(0,3).map(()=>'<div class="cal-dot"></div>').join('')}</div>`:''}
+    </div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+  renderDayDetail();
+}
+
+function renderDayDetail(){
+  const el=document.getElementById('day-detail'); if(!selectedDay){el.innerHTML='';return}
+  const dayEvs=events.filter(e=>e.date===selectedDay);
+  const[y,m,d]=selectedDay.split('-');
+  el.innerHTML=`<div class="day-detail">
+    <div class="day-detail-title">${MONTHS[parseInt(m)-1]} ${parseInt(d)}, ${y}</div>
+    ${dayEvs.length===0?'<div style="color:var(--muted);font-size:14px;margin-bottom:10px">No events. Add below.</div>':''}
+    ${dayEvs.map(ev=>`<div class="event-item">
+      <div class="event-bar"></div>
+      <div class="event-body">
+        <div class="event-title">${esc(ev.title)}</div>
+        ${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}
+        ${ev.note?`<div class="event-note">${esc(ev.note)}</div>`:''}
+      </div>
+      <button class="del-btn" onclick="deleteEvent('${ev.id}')">×</button>
+    </div>`).join('')}
+    <div class="event-add-form">
+      <input type="text" id="ev-title" placeholder="Event title" autocomplete="off">
+      <input type="time" id="ev-time" style="color-scheme:dark">
+      <input type="text" id="ev-note" placeholder="Note (optional)" autocomplete="off">
+      <button onclick="addEventManual()">Add Event</button>
+    </div>
+  </div>`;
+}
+
+function addEventManual(){
+  const title=document.getElementById('ev-title')?.value.trim();
+  if(!title){showToast('Enter event title');return}
+  events.push({id:uid(),title,date:selectedDay,time:document.getElementById('ev-time')?.value||null,note:document.getElementById('ev-note')?.value.trim()||null});
+  persist(); updateMeta(); renderCalendar(); renderToday();
+  showToast('Event added ✓');
+}
+function deleteEvent(id){events=events.filter(e=>e.id!==id);persist();updateMeta();renderCalendar();renderToday()}
+
+// ── Chat ──────────────────────────────────────────────────────────────────────
+function renderChat(){
+  const el=document.getElementById('chat-messages');
+  el.innerHTML=chatHistory.map(m=>`<div class="msg ${m.role}"><div class="bubble">${esc(m.content)}</div></div>`).join('');
+  setTimeout(()=>el.scrollTop=el.scrollHeight,50);
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const text=inp.value.trim(); if(!text||isSending) return;
+  inp.value=''; inp.style.height='auto';
+  document.getElementById('send-btn').disabled=true;
+  if(!apiKey){
+    chatHistory.push({role:'user',content:text});
+    chatHistory.push({role:'assistant',content:'AI chat needs an API key. Reload the page to add one.'});
+    renderChat(); return;
+  }
+  isSending=true;
+  chatHistory.push({role:'user',content:text});
+  chatHistory.push({role:'assistant',content:'…'});
+  renderChat();
+  try{
+    const allCatTags=Object.entries(tags).map(([c,ts])=>`${c}: ${ts.join(', ')||'none'}`).join(' | ');
+    const msgs=chatHistory.slice(0,-1).filter(m=>!(m.role==='assistant'&&m.content==='…')).map(m=>({role:m.role,content:m.content}));
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,
+        system:`You are a personal agent. Return ONLY valid JSON:
+{"action":"add_todo"|"add_event"|"chat","todo":{"title":string,"priority":"high"|"medium"|"low","category":"work"|"personal"|"investing","tag":string|null,"due":"YYYY-MM-DD"|null,"recurring":"daily"|"weekly"|null},"event":{"title":string,"date":"YYYY-MM-DD","time":"HH:MM"|null,"note":string|null},"reply":string}
+Available tags — ${allCatTags}. Today: ${todayStr}.`,
+        messages:msgs})
+    });
+    const data=await res.json();
+    const raw=data.content?.find(b=>b.type==='text')?.text||'{}';
+    let result; try{result=JSON.parse(raw)}catch{result={action:'chat',reply:raw}}
+    chatHistory.pop();
+    if(result.action==='add_todo'&&result.todo){
+      todos.unshift({id:uid(),...result.todo,done:false,created:todayStr});
+      persist(); updateMeta(); renderToday(); showToast('Task added ✓');
+    }
+    if(result.action==='add_event'&&result.event){
+      events.push({id:uid(),...result.event});
+      persist(); updateMeta(); renderToday(); showToast('Event added ✓');
+    }
+    chatHistory.push({role:'assistant',content:result.reply||'Done!'});
+  }catch(e){
+    chatHistory.pop();
+    chatHistory.push({role:'assistant',content:'Something went wrong. Check your API key.'});
+  }
+  isSending=false; renderChat();
+}
+</script>
+</body>
+</html>
