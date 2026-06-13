@@ -19,6 +19,22 @@
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
 #app{display:flex;flex-direction:column;height:100vh;height:100dvh}
 
+/* ── PIN SCREEN ── */
+#pinscreen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
+#pinscreen .pin-logo{font-size:40px;margin-bottom:20px}
+#pinscreen h2{font-size:22px;font-weight:800;margin-bottom:6px}
+#pinscreen p{color:var(--muted);font-size:14px;margin-bottom:32px}
+.pin-dots{display:flex;gap:16px;margin-bottom:32px}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .15s}
+.pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+.pin-dot.error{background:var(--danger);border-color:var(--danger)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px}
+.pin-key{height:70px;border-radius:16px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:24px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .1s;display:flex;align-items:center;justify-content:center}
+.pin-key:active{background:var(--accent);color:#111;transform:scale(.95)}
+.pin-key.del{font-size:18px;color:var(--muted)}
+.pin-key.empty{background:transparent;border-color:transparent;cursor:default}
+.pin-error{color:var(--danger);font-size:13px;margin-top:-20px;margin-bottom:20px;height:18px;text-align:center}
+
 /* Topbar */
 #topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:calc(var(--safe-top)+10px) 16px 10px;flex-shrink:0}
 .topbar-row1{display:flex;align-items:center;justify-content:space-between}
@@ -26,9 +42,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .date-chip{font-size:11px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 10px}
 .topbar-row2{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
 .mode-toggle{display:flex;background:var(--card);border-radius:20px;padding:3px;gap:2px;border:1px solid var(--border)}
-.mode-btn{padding:5px 12px;border-radius:16px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);-webkit-tap-highlight-color:transparent}
+.mode-btn{padding:5px 10px;border-radius:16px;border:none;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);-webkit-tap-highlight-color:transparent}
 .mode-btn.active{background:var(--accent);color:#111}
-.meta-chips{display:flex;gap:6px}
 .meta-chip{font-size:11px;color:var(--muted)}
 
 /* Content */
@@ -88,21 +103,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .task-form input,.task-form select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit;margin-bottom:8px;appearance:none;-webkit-appearance:none}
 .task-form input:focus,.task-form select:focus{border-color:var(--accent)}
 .task-form select option{background:var(--surface)}
-.form-row{display:flex;gap:8px}
-.form-row>*{flex:1}
+.form-row{display:flex;gap:8px}.form-row>*{flex:1}
 .form-btns{display:flex;gap:8px;margin-top:6px}
 .form-btn{flex:1;padding:11px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .form-btn.primary{background:var(--accent);color:#111}
 .form-btn.secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
-
-/* Category pill selector inside form */
 .cat-selector{display:flex;gap:6px;margin-bottom:8px}
 .cat-pill{padding:7px 14px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:transparent;-webkit-tap-highlight-color:transparent;transition:all .15s}
 .cat-pill.work{color:var(--work)}.cat-pill.work.sel{background:var(--work);color:#fff;border-color:var(--work)}
 .cat-pill.personal{color:var(--personal)}.cat-pill.personal.sel{background:var(--personal);color:#fff;border-color:var(--personal)}
 .cat-pill.investing{color:var(--investing)}.cat-pill.investing.sel{background:var(--investing);color:#fff;border-color:var(--investing)}
-
-/* Tag selector in form */
 .tag-selector-wrap{margin-bottom:8px}
 .tag-selector-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
 .tag-pills{display:flex;flex-wrap:wrap;gap:6px}
@@ -134,7 +144,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .del-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .empty-state{text-align:center;color:var(--muted);margin-top:50px;font-size:14px;line-height:2}
 
-/* Tags Management Panel */
+/* Tags Management */
 .tags-section{margin-bottom:24px}
 .tags-cat-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .tags-cat-dot{width:10px;height:10px;border-radius:50%}
@@ -195,8 +205,36 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 </head>
 <body>
 
+<!-- PIN Screen -->
+<div id="pinscreen">
+  <div class="pin-logo">🔐</div>
+  <h2>Personal Agent</h2>
+  <p>Enter your PIN to continue</p>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
+  </div>
+</div>
+
 <!-- API Key Screen -->
-<div id="apiscreen">
+<div id="apiscreen" style="display:none">
   <div style="font-size:36px;margin-bottom:16px">◆</div>
   <h2>Personal Agent</h2>
   <p>Enter your Anthropic API key to enable AI features. Tasks & calendar work without it.</p>
@@ -206,7 +244,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <div class="note">Stored only on this device · ~₹5–10/month for personal use<br>Get a key at console.anthropic.com</div>
 </div>
 
-<div id="app">
+<div id="app" style="display:none">
   <div id="topbar">
     <div class="topbar-row1">
       <div class="logo"><span>◆</span> Personal Agent</div>
@@ -219,9 +257,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         <button class="mode-btn" onclick="setMode('personal',this)">Personal</button>
         <button class="mode-btn" onclick="setMode('investing',this)">Investing</button>
       </div>
-      <div class="meta-chips">
-        <div class="meta-chip" id="meta-tasks">—</div>
-      </div>
+      <div class="meta-chip" id="meta-tasks">—</div>
     </div>
   </div>
 
@@ -250,14 +286,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <div id="task-form-wrap" style="display:none">
         <div class="task-form">
           <input type="text" id="tf-title" placeholder="Task title">
-          <!-- Category picker -->
           <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Category</div>
           <div class="cat-selector" id="cat-selector">
             <button class="cat-pill work sel" onclick="selectCat('work',this)">💼 Work</button>
             <button class="cat-pill personal" onclick="selectCat('personal',this)">🏠 Personal</button>
             <button class="cat-pill investing" onclick="selectCat('investing',this)">📈 Investing</button>
           </div>
-          <!-- Tag picker — dynamic -->
           <div class="tag-selector-wrap">
             <div class="tag-selector-label">Tag (optional)</div>
             <div class="tag-pills" id="tag-pills"></div>
@@ -266,7 +300,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
               <button onclick="inlineAddTag()">+</button>
             </div>
           </div>
-          <!-- Priority + recurring -->
           <div class="form-row">
             <select id="tf-priority">
               <option value="high">🔴 High</option>
@@ -313,7 +346,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <div id="day-detail"></div>
     </div>
 
-    <!-- Tags Management -->
+    <!-- Tags -->
     <div class="panel" id="panel-tags">
       <div id="tags-manager"></div>
     </div>
@@ -358,20 +391,65 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 <div id="toast"></div>
 
 <script>
+const CORRECT_PIN='0810';
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const today=new Date(), todayStr=today.toISOString().slice(0,10);
 
+// ── PIN ───────────────────────────────────────────────────────────────────────
+let pinEntry='';
+
+// Auto-unlock if already verified this session
+if(sessionStorage.getItem('pa-unlocked')==='1') unlockApp();
+
+function pinKey(k){
+  if(pinEntry.length>=4) return;
+  pinEntry+=k;
+  updatePinDots();
+  if(pinEntry.length===4) setTimeout(checkPin,100);
+}
+function pinDel(){
+  pinEntry=pinEntry.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-error').textContent='';
+}
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.classList.toggle('filled',i<pinEntry.length);
+    d.classList.remove('error');
+  }
+}
+function checkPin(){
+  if(pinEntry===CORRECT_PIN){
+    sessionStorage.setItem('pa-unlocked','1');
+    unlockApp();
+  } else {
+    for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.add('error');
+    document.getElementById('pin-error').textContent='Incorrect PIN. Try again.';
+    setTimeout(()=>{
+      pinEntry='';
+      updatePinDots();
+    },800);
+  }
+}
+function unlockApp(){
+  document.getElementById('pinscreen').style.display='none';
+  if(apiKey||localStorage.getItem('pa-skipped')){
+    document.getElementById('app').style.display='flex';
+  } else {
+    document.getElementById('apiscreen').style.display='flex';
+  }
+}
+
 // ── State ─────────────────────────────────────────────────────────────────────
-let todos   = JSON.parse(localStorage.getItem('pa-todos')||'[]');
-let events  = JSON.parse(localStorage.getItem('pa-events')||'[]');
-// tags: { work: ["Deal Flow","Portfolio",...], personal: [...], investing: [...] }
-let tags    = JSON.parse(localStorage.getItem('pa-tags')||'{"work":[],"personal":[],"investing":[]}');
-let apiKey  = localStorage.getItem('pa-apikey')||'';
+let todos  = JSON.parse(localStorage.getItem('pa-todos')||'[]');
+let events = JSON.parse(localStorage.getItem('pa-events')||'[]');
+let tags   = JSON.parse(localStorage.getItem('pa-tags')||'{"work":[],"personal":[],"investing":[]}');
+let apiKey = localStorage.getItem('pa-apikey')||'';
 let chatHistory=[{role:'assistant',content:'Hi! I\'m your personal agent.\n\nTry:\n• "Add high priority work task: due diligence review by Friday"\n• "Add investing task: review portfolio returns this week"\n• "Schedule LP call June 25 at 4pm"\n• "What should I focus on today?"'}];
-let currentFilter='all', currentMode='all', currentTab='today';
-let calState={year:today.getFullYear(),month:today.getMonth()}, selectedDay=null;
-let isSending=false, showTaskForm=false;
-let selectedCat='work', selectedTag=null;
+let currentFilter='all',currentMode='all',currentTab='today';
+let calState={year:today.getFullYear(),month:today.getMonth()},selectedDay=null;
+let isSending=false,showTaskForm=false,selectedCat='work',selectedTag=null;
 
 function uid(){return Math.random().toString(36).slice(2,9)}
 function persist(){
@@ -384,10 +462,8 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 // ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('top-date').textContent=today.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-  if(apiKey||localStorage.getItem('pa-skipped')) document.getElementById('apiscreen').style.display='none';
   processDailyRecurring();
   updateMeta(); renderToday(); renderTodos(); renderCalendar(); renderChat(); renderTagsManager();
-
   const inp=document.getElementById('chat-input');
   inp.addEventListener('input',()=>{
     document.getElementById('send-btn').disabled=!inp.value.trim()||isSending;
@@ -403,8 +479,13 @@ function saveApiKey(){
   if(!v){showToast('Paste your API key first');return}
   apiKey=v; localStorage.setItem('pa-apikey',v);
   document.getElementById('apiscreen').style.display='none';
+  document.getElementById('app').style.display='flex';
 }
-function skipApiKey(){localStorage.setItem('pa-skipped','1');document.getElementById('apiscreen').style.display='none'}
+function skipApiKey(){
+  localStorage.setItem('pa-skipped','1');
+  document.getElementById('apiscreen').style.display='none';
+  document.getElementById('app').style.display='flex';
+}
 
 // ── Mode ──────────────────────────────────────────────────────────────────────
 function setMode(mode,btn){
@@ -413,15 +494,11 @@ function setMode(mode,btn){
   btn.classList.add('active');
   renderToday(); renderTodos();
 }
-function modeFilter(arr){
-  if(currentMode==='all') return arr;
-  return arr.filter(t=>t.category===currentMode);
-}
+function modeFilter(arr){return currentMode==='all'?arr:arr.filter(t=>t.category===currentMode)}
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 function updateMeta(){
-  const active=modeFilter(todos).filter(t=>!t.done).length;
-  document.getElementById('meta-tasks').textContent=`${active} active`;
+  document.getElementById('meta-tasks').textContent=`${modeFilter(todos).filter(t=>!t.done).length} active`;
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
@@ -448,126 +525,89 @@ function switchTab(tab){
 // ── Tags ──────────────────────────────────────────────────────────────────────
 function catColor(cat){return cat==='work'?'var(--work)':cat==='personal'?'var(--personal)':'var(--investing)'}
 function catEmoji(cat){return cat==='work'?'💼':cat==='personal'?'🏠':'📈'}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 
 function renderTagsManager(){
-  const el=document.getElementById('tags-manager');
-  const cats=['work','personal','investing'];
+  const el=document.getElementById('tags-manager'); if(!el) return;
   el.innerHTML=`<div style="font-size:16px;font-weight:700;margin-bottom:20px">Manage Tags</div>`+
-  cats.map(cat=>`
+  ['work','personal','investing'].map(cat=>`
     <div class="tags-section">
       <div class="tags-cat-header">
         <div class="tags-cat-dot" style="background:${catColor(cat)}"></div>
         <div class="tags-cat-label">${catEmoji(cat)} ${cap(cat)}</div>
       </div>
       <div class="tags-list">
-        ${(tags[cat]||[]).map(tag=>`
-          <div class="manage-tag">
-            <span>${esc(tag)}</span>
-            <button onclick="deleteTag('${cat}','${tag}')" title="Delete">×</button>
-          </div>`).join('')}
-        ${(tags[cat]||[]).length===0?`<div style="font-size:13px;color:var(--muted)">No tags yet</div>`:''}
+        ${(tags[cat]||[]).map(tag=>`<div class="manage-tag"><span>${esc(tag)}</span><button onclick="deleteTag('${cat}','${tag}')">×</button></div>`).join('')}
+        ${!(tags[cat]||[]).length?'<div style="font-size:13px;color:var(--muted)">No tags yet</div>':''}
       </div>
       <div class="add-tag-row">
-        <input type="text" id="add-tag-${cat}" placeholder="New ${cat} tag…" autocomplete="off"
-          onkeydown="if(event.key==='Enter')addTag('${cat}')">
+        <input type="text" id="add-tag-${cat}" placeholder="New ${cat} tag…" autocomplete="off" onkeydown="if(event.key==='Enter')addTag('${cat}')">
         <button onclick="addTag('${cat}')">+</button>
       </div>
-    </div>`).join('<div style="height:1px;background:var(--border);margin:8px 0 20px"></div>');
+    </div>
+    <div style="height:1px;background:var(--border);margin:8px 0 20px"></div>`).join('');
 }
-
-function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 
 function addTag(cat){
   const inp=document.getElementById(`add-tag-${cat}`);
   const val=inp.value.trim(); if(!val) return;
   if(!tags[cat]) tags[cat]=[];
   if(tags[cat].includes(val)){showToast('Tag already exists');return}
-  tags[cat].push(val);
-  persist(); inp.value=''; renderTagsManager();
-  showToast(`Tag "${val}" added`);
+  tags[cat].push(val); persist(); inp.value=''; renderTagsManager(); showToast(`Tag "${val}" added`);
 }
-
 function deleteTag(cat,tag){
   tags[cat]=(tags[cat]||[]).filter(t=>t!==tag);
-  // Remove tag from existing todos
   todos=todos.map(t=>t.tag===tag&&t.category===cat?{...t,tag:null}:t);
-  persist(); renderTagsManager(); renderTodos();
-  showToast(`Tag "${tag}" deleted`);
+  persist(); renderTagsManager(); renderTodos(); showToast(`Tag "${tag}" deleted`);
 }
 
-// ── Task form helpers ─────────────────────────────────────────────────────────
+// ── Task form ─────────────────────────────────────────────────────────────────
 function selectCat(cat,btn){
   selectedCat=cat; selectedTag=null;
   document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-  refreshTagPills();
+  btn.classList.add('sel'); refreshTagPills();
 }
-
 function refreshTagPills(){
-  const container=document.getElementById('tag-pills'); if(!container) return;
-  const catTags=tags[selectedCat]||[];
-  container.innerHTML=catTags.map(tag=>`
-    <button class="tag-pick-pill ${selectedTag===tag?'sel':''}" onclick="selectTag('${tag}',this)">${esc(tag)}</button>
-  `).join('');
+  const c=document.getElementById('tag-pills'); if(!c) return;
+  c.innerHTML=(tags[selectedCat]||[]).map(tag=>`<button class="tag-pick-pill ${selectedTag===tag?'sel':''}" onclick="selectTag('${tag}',this)">${esc(tag)}</button>`).join('');
 }
-
 function selectTag(tag,btn){
   if(selectedTag===tag){selectedTag=null;btn.classList.remove('sel')}
   else{selectedTag=tag;document.querySelectorAll('.tag-pick-pill').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel')}
 }
-
 function inlineAddTag(){
   const inp=document.getElementById('inline-tag-input');
   const val=inp.value.trim(); if(!val) return;
   if(!tags[selectedCat]) tags[selectedCat]=[];
   if(!tags[selectedCat].includes(val)) tags[selectedCat].push(val);
-  selectedTag=val; persist(); inp.value=''; refreshTagPills();
-  showToast(`Tag "${val}" added`);
+  selectedTag=val; persist(); inp.value=''; refreshTagPills(); showToast(`Tag "${val}" added`);
 }
-
-// ── Task CRUD ─────────────────────────────────────────────────────────────────
 function toggleTaskForm(){
   showTaskForm=!showTaskForm;
   document.getElementById('task-form-wrap').style.display=showTaskForm?'block':'none';
   if(showTaskForm){selectedCat='work';selectedTag=null;refreshTagPills();document.getElementById('tf-title').focus()}
 }
-
 function addTaskFromForm(){
   const title=document.getElementById('tf-title').value.trim();
   if(!title){showToast('Enter a task title');return}
-  todos.unshift({
-    id:uid(), title,
-    category: selectedCat,
-    tag: selectedTag||null,
-    priority: document.getElementById('tf-priority').value,
-    recurring: document.getElementById('tf-recurring').value||null,
-    due: document.getElementById('tf-due').value||null,
-    done:false, created:todayStr
-  });
+  todos.unshift({id:uid(),title,category:selectedCat,tag:selectedTag||null,priority:document.getElementById('tf-priority').value,recurring:document.getElementById('tf-recurring').value||null,due:document.getElementById('tf-due').value||null,done:false,created:todayStr});
   persist(); updateMeta(); renderTodos(); renderToday();
   document.getElementById('tf-title').value='';
   document.getElementById('tf-due').value='';
-  selectedTag=null; toggleTaskForm();
-  showToast('Task added ✓');
+  selectedTag=null; toggleTaskForm(); showToast('Task added ✓');
 }
-
 function quickAddTask(){
   const inp=document.getElementById('quick-task-input');
   const val=inp.value.trim(); if(!val) return;
-  const cat=currentMode==='all'?'work':currentMode;
-  todos.unshift({id:uid(),title:val,category:cat,tag:null,priority:'medium',recurring:null,due:null,done:false,created:todayStr});
-  inp.value=''; persist(); updateMeta(); renderTodos(); renderToday();
-  showToast('Task added ✓');
+  todos.unshift({id:uid(),title:val,category:currentMode==='all'?'work':currentMode,tag:null,priority:'medium',recurring:null,due:null,done:false,created:todayStr});
+  inp.value=''; persist(); updateMeta(); renderTodos(); renderToday(); showToast('Task added ✓');
 }
-
 function setFilter(f,btn){
   currentFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); renderTodos();
 }
-
 function isOverdue(t){return t.due&&t.due<todayStr&&!t.done}
-
 function renderTodoHTML(t){
   const dotCol={high:'#E05C5C',medium:'#F5A623',low:'#4CAF87'};
   const overdue=isOverdue(t);
@@ -590,21 +630,15 @@ function renderTodoHTML(t){
     <button class="del-btn" onclick="deleteTodo('${t.id}')">×</button>
   </div>`;
 }
-
 function renderTodos(){
   const list=document.getElementById('todo-list');
-  let filtered=modeFilter(todos);
-  if(currentFilter==='active') filtered=filtered.filter(t=>!t.done);
-  else if(currentFilter==='done') filtered=filtered.filter(t=>t.done);
-  else if(currentFilter==='high') filtered=filtered.filter(t=>!t.done&&t.priority==='high');
-  else if(currentFilter==='overdue') filtered=filtered.filter(t=>isOverdue(t));
-  if(!filtered.length){
-    list.innerHTML=`<div class="empty-state">${currentFilter==='done'?'No completed tasks yet.':'No tasks. Add one above!'}</div>`;
-    return;
-  }
-  list.innerHTML=filtered.map(t=>renderTodoHTML(t)).join('');
+  let f=modeFilter(todos);
+  if(currentFilter==='active') f=f.filter(t=>!t.done);
+  else if(currentFilter==='done') f=f.filter(t=>t.done);
+  else if(currentFilter==='high') f=f.filter(t=>!t.done&&t.priority==='high');
+  else if(currentFilter==='overdue') f=f.filter(t=>isOverdue(t));
+  list.innerHTML=f.length?f.map(t=>renderTodoHTML(t)).join(''):`<div class="empty-state">${currentFilter==='done'?'No completed tasks yet.':'No tasks. Add one above!'}</div>`;
 }
-
 function toggleTodo(id){todos=todos.map(t=>t.id===id?{...t,done:!t.done}:t);persist();updateMeta();renderTodos();renderToday()}
 function deleteTodo(id){todos=todos.filter(t=>t.id!==id);persist();updateMeta();renderTodos();renderToday()}
 
@@ -618,7 +652,7 @@ function processDailyRecurring(){
     if(t.recurring==='daily'&&!todos.find(x=>x.title===t.title&&x.due===todayStr&&x.id!==t.id))
       toAdd.push({...t,id:uid(),done:false,due:todayStr,created:todayStr});
     if(t.recurring==='weekly'){
-      const diff=Math.floor((new Date()-new Date(t.created))/(864e5));
+      const diff=Math.floor((new Date()-new Date(t.created))/864e5);
       if(diff>=7&&!todos.find(x=>x.title===t.title&&x.due===todayStr&&x.id!==t.id))
         toAdd.push({...t,id:uid(),done:false,due:todayStr,created:todayStr});
     }
@@ -629,42 +663,28 @@ function processDailyRecurring(){
 
 // ── Today ─────────────────────────────────────────────────────────────────────
 function renderToday(){
-  const filtered=modeFilter(todos);
-  const due=filtered.filter(t=>!t.done&&t.due&&t.due<=todayStr);
-  document.getElementById('today-tasks').innerHTML=due.length
-    ?due.map(t=>renderTodoHTML(t)).join('')
-    :'<div class="empty-state" style="margin-top:8px">No tasks due today 🎉</div>';
-  const todayEvs=events.filter(e=>e.date===todayStr);
-  document.getElementById('today-events').innerHTML=todayEvs.length
-    ?todayEvs.map(ev=>`<div class="today-event"><div class="event-bar"></div><div class="event-body"><div class="event-title">${esc(ev.title)}</div>${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}</div></div>`).join('')
+  const due=modeFilter(todos).filter(t=>!t.done&&t.due&&t.due<=todayStr);
+  document.getElementById('today-tasks').innerHTML=due.length?due.map(t=>renderTodoHTML(t)).join(''):'<div class="empty-state" style="margin-top:8px">No tasks due today 🎉</div>';
+  const evs=events.filter(e=>e.date===todayStr);
+  document.getElementById('today-events').innerHTML=evs.length
+    ?evs.map(ev=>`<div class="today-event"><div class="event-bar"></div><div class="event-body"><div class="event-title">${esc(ev.title)}</div>${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}</div></div>`).join('')
     :'<div class="empty-state" style="margin-top:8px">No events today</div>';
 }
 
-// ── Morning Briefing ──────────────────────────────────────────────────────────
+// ── Briefing ──────────────────────────────────────────────────────────────────
 async function generateBriefing(){
-  const btn=document.getElementById('briefing-btn');
-  const content=document.getElementById('briefing-content');
+  const btn=document.getElementById('briefing-btn'),content=document.getElementById('briefing-content');
   if(!apiKey){content.innerHTML='<div class="briefing-empty">Add an API key to use AI briefings</div>';return}
   btn.disabled=true; btn.textContent='Loading…';
   content.innerHTML='<div class="briefing-empty">Thinking…</div>';
-  const dueTasks=todos.filter(t=>!t.done&&t.due&&t.due<=todayStr);
-  const todayEvs=events.filter(e=>e.date===todayStr);
-  const highP=todos.filter(t=>!t.done&&t.priority==='high').slice(0,5);
-  const ctx=`Today: ${todayStr}
-Due/overdue: ${dueTasks.map(t=>`${t.title} (${t.priority}, ${t.category}${t.tag?'/'+t.tag:''})`).join(', ')||'None'}
-Today's events: ${todayEvs.map(e=>`${e.title}${e.time?' at '+fmtTime(e.time):''}`).join(', ')||'None'}
-High priority tasks: ${highP.map(t=>`${t.title} [${t.category}]`).join(', ')||'None'}`;
+  const due=todos.filter(t=>!t.done&&t.due&&t.due<=todayStr);
+  const evs=events.filter(e=>e.date===todayStr);
+  const high=todos.filter(t=>!t.done&&t.priority==='high').slice(0,5);
+  const ctx=`Today: ${todayStr}\nDue/overdue: ${due.map(t=>`${t.title} (${t.priority}, ${t.category}${t.tag?'/'+t.tag:''})`).join(', ')||'None'}\nToday's events: ${evs.map(e=>`${e.title}${e.time?' at '+fmtTime(e.time):''}`).join(', ')||'None'}\nHigh priority: ${high.map(t=>`${t.title} [${t.category}]`).join(', ')||'None'}`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
-        system:'You are a sharp personal assistant. Give a concise morning briefing in 3-4 short prose paragraphs. No bullet points. End with one clear focus recommendation.',
-        messages:[{role:'user',content:`My day:\n${ctx}\n\nGive me a morning briefing.`}]})
-    });
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a sharp personal assistant. Give a concise morning briefing in 3-4 short prose paragraphs. No bullet points. End with one clear focus recommendation.',messages:[{role:'user',content:`My day:\n${ctx}\n\nGive me a morning briefing.`}]})});
     const data=await res.json();
-    const text=data.content?.find(b=>b.type==='text')?.text||'Could not generate briefing.';
-    content.innerHTML=`<div class="briefing-content">${esc(text)}</div>`;
+    content.innerHTML=`<div class="briefing-content">${esc(data.content?.find(b=>b.type==='text')?.text||'Could not generate.')}</div>`;
   }catch(e){content.innerHTML='<div class="briefing-empty">Error — check your API key</div>'}
   btn.disabled=false; btn.textContent='Refresh';
 }
@@ -673,56 +693,30 @@ High priority tasks: ${highP.map(t=>`${t.title} [${t.category}]`).join(', ')||'N
 function fmtTime(t){if(!t)return'';const[h,m]=t.split(':').map(Number);return`${(h%12)||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`}
 function calNav(dir){const d=new Date(calState.year,calState.month+dir);calState={year:d.getFullYear(),month:d.getMonth()};selectedDay=null;renderCalendar()}
 function selectDay(ds){selectedDay=selectedDay===ds?null:ds;renderCalendar()}
-
 function renderCalendar(){
   document.getElementById('cal-title').textContent=`${MONTHS[calState.month]} ${calState.year}`;
-  const first=new Date(calState.year,calState.month,1).getDay();
-  const last=new Date(calState.year,calState.month+1,0).getDate();
+  const first=new Date(calState.year,calState.month,1).getDay(),last=new Date(calState.year,calState.month+1,0).getDate();
   let html='';
   for(let i=0;i<first;i++) html+='<div class="cal-cell empty"></div>';
   for(let d=1;d<=last;d++){
     const ds=`${calState.year}-${String(calState.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const evs=events.filter(e=>e.date===ds);
-    html+=`<div class="cal-cell ${ds===todayStr?'today':''} ${selectedDay===ds?'selected':''}" onclick="selectDay('${ds}')">
-      <div class="cal-day-num">${d}</div>
-      ${evs.length?`<div class="cal-dots">${evs.slice(0,3).map(()=>'<div class="cal-dot"></div>').join('')}</div>`:''}
-    </div>`;
+    html+=`<div class="cal-cell ${ds===todayStr?'today':''} ${selectedDay===ds?'selected':''}" onclick="selectDay('${ds}')"><div class="cal-day-num">${d}</div>${evs.length?`<div class="cal-dots">${evs.slice(0,3).map(()=>'<div class="cal-dot"></div>').join('')}</div>`:''}</div>`;
   }
   document.getElementById('cal-grid').innerHTML=html;
   renderDayDetail();
 }
-
 function renderDayDetail(){
   const el=document.getElementById('day-detail'); if(!selectedDay){el.innerHTML='';return}
-  const dayEvs=events.filter(e=>e.date===selectedDay);
+  const evs=events.filter(e=>e.date===selectedDay);
   const[y,m,d]=selectedDay.split('-');
-  el.innerHTML=`<div class="day-detail">
-    <div class="day-detail-title">${MONTHS[parseInt(m)-1]} ${parseInt(d)}, ${y}</div>
-    ${dayEvs.length===0?'<div style="color:var(--muted);font-size:14px;margin-bottom:10px">No events. Add below.</div>':''}
-    ${dayEvs.map(ev=>`<div class="event-item">
-      <div class="event-bar"></div>
-      <div class="event-body">
-        <div class="event-title">${esc(ev.title)}</div>
-        ${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}
-        ${ev.note?`<div class="event-note">${esc(ev.note)}</div>`:''}
-      </div>
-      <button class="del-btn" onclick="deleteEvent('${ev.id}')">×</button>
-    </div>`).join('')}
-    <div class="event-add-form">
-      <input type="text" id="ev-title" placeholder="Event title" autocomplete="off">
-      <input type="time" id="ev-time" style="color-scheme:dark">
-      <input type="text" id="ev-note" placeholder="Note (optional)" autocomplete="off">
-      <button onclick="addEventManual()">Add Event</button>
-    </div>
-  </div>`;
+  el.innerHTML=`<div class="day-detail"><div class="day-detail-title">${MONTHS[parseInt(m)-1]} ${parseInt(d)}, ${y}</div>${evs.length===0?'<div style="color:var(--muted);font-size:14px;margin-bottom:10px">No events. Add below.</div>':''}${evs.map(ev=>`<div class="event-item"><div class="event-bar"></div><div class="event-body"><div class="event-title">${esc(ev.title)}</div>${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}${ev.note?`<div class="event-note">${esc(ev.note)}</div>`:''}</div><button class="del-btn" onclick="deleteEvent('${ev.id}')">×</button></div>`).join('')}<div class="event-add-form"><input type="text" id="ev-title" placeholder="Event title" autocomplete="off"><input type="time" id="ev-time" style="color-scheme:dark"><input type="text" id="ev-note" placeholder="Note (optional)" autocomplete="off"><button onclick="addEventManual()">Add Event</button></div></div>`;
 }
-
 function addEventManual(){
   const title=document.getElementById('ev-title')?.value.trim();
   if(!title){showToast('Enter event title');return}
   events.push({id:uid(),title,date:selectedDay,time:document.getElementById('ev-time')?.value||null,note:document.getElementById('ev-note')?.value.trim()||null});
-  persist(); updateMeta(); renderCalendar(); renderToday();
-  showToast('Event added ✓');
+  persist(); updateMeta(); renderCalendar(); renderToday(); showToast('Event added ✓');
 }
 function deleteEvent(id){events=events.filter(e=>e.id!==id);persist();updateMeta();renderCalendar();renderToday()}
 
@@ -732,50 +726,27 @@ function renderChat(){
   el.innerHTML=chatHistory.map(m=>`<div class="msg ${m.role}"><div class="bubble">${esc(m.content)}</div></div>`).join('');
   setTimeout(()=>el.scrollTop=el.scrollHeight,50);
 }
-
 async function sendChat(){
   const inp=document.getElementById('chat-input');
   const text=inp.value.trim(); if(!text||isSending) return;
   inp.value=''; inp.style.height='auto';
   document.getElementById('send-btn').disabled=true;
-  if(!apiKey){
-    chatHistory.push({role:'user',content:text});
-    chatHistory.push({role:'assistant',content:'AI chat needs an API key. Reload the page to add one.'});
-    renderChat(); return;
-  }
+  if(!apiKey){chatHistory.push({role:'user',content:text},{role:'assistant',content:'AI chat needs an API key. Reload the page to add one.'});renderChat();return}
   isSending=true;
-  chatHistory.push({role:'user',content:text});
-  chatHistory.push({role:'assistant',content:'…'});
+  chatHistory.push({role:'user',content:text},{role:'assistant',content:'…'});
   renderChat();
   try{
     const allCatTags=Object.entries(tags).map(([c,ts])=>`${c}: ${ts.join(', ')||'none'}`).join(' | ');
     const msgs=chatHistory.slice(0,-1).filter(m=>!(m.role==='assistant'&&m.content==='…')).map(m=>({role:m.role,content:m.content}));
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,
-        system:`You are a personal agent. Return ONLY valid JSON:
-{"action":"add_todo"|"add_event"|"chat","todo":{"title":string,"priority":"high"|"medium"|"low","category":"work"|"personal"|"investing","tag":string|null,"due":"YYYY-MM-DD"|null,"recurring":"daily"|"weekly"|null},"event":{"title":string,"date":"YYYY-MM-DD","time":"HH:MM"|null,"note":string|null},"reply":string}
-Available tags — ${allCatTags}. Today: ${todayStr}.`,
-        messages:msgs})
-    });
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,system:`You are a personal agent. Return ONLY valid JSON:\n{"action":"add_todo"|"add_event"|"chat","todo":{"title":string,"priority":"high"|"medium"|"low","category":"work"|"personal"|"investing","tag":string|null,"due":"YYYY-MM-DD"|null,"recurring":"daily"|"weekly"|null},"event":{"title":string,"date":"YYYY-MM-DD","time":"HH:MM"|null,"note":string|null},"reply":string}\nAvailable tags — ${allCatTags}. Today: ${todayStr}.`,messages:msgs})});
     const data=await res.json();
     const raw=data.content?.find(b=>b.type==='text')?.text||'{}';
     let result; try{result=JSON.parse(raw)}catch{result={action:'chat',reply:raw}}
     chatHistory.pop();
-    if(result.action==='add_todo'&&result.todo){
-      todos.unshift({id:uid(),...result.todo,done:false,created:todayStr});
-      persist(); updateMeta(); renderToday(); showToast('Task added ✓');
-    }
-    if(result.action==='add_event'&&result.event){
-      events.push({id:uid(),...result.event});
-      persist(); updateMeta(); renderToday(); showToast('Event added ✓');
-    }
+    if(result.action==='add_todo'&&result.todo){todos.unshift({id:uid(),...result.todo,done:false,created:todayStr});persist();updateMeta();renderToday();showToast('Task added ✓')}
+    if(result.action==='add_event'&&result.event){events.push({id:uid(),...result.event});persist();updateMeta();renderToday();showToast('Event added ✓')}
     chatHistory.push({role:'assistant',content:result.reply||'Done!'});
-  }catch(e){
-    chatHistory.pop();
-    chatHistory.push({role:'assistant',content:'Something went wrong. Check your API key.'});
-  }
+  }catch(e){chatHistory.pop();chatHistory.push({role:'assistant',content:'Something went wrong. Check your API key.'})}
   isSending=false; renderChat();
 }
 </script>
