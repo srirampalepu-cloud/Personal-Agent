@@ -1,1138 +1,534 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Agent">
-<title>Personal Agent</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0F1117;--surface:#181C27;--card:#1E2333;--border:#2A3045;
-  --accent:#F5A623;--accent-dim:#3A2E10;--text:#E8EAF0;--muted:#6B7592;
-  --danger:#E05C5C;--success:#4CAF87;--purple:#8B7CF6;--blue:#4A9EF5;
-  --work:#4A9EF5;--personal:#8B7CF6;--investing:#4CAF87;
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-  --safe-top:env(safe-area-inset-top,0px);
-}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Storm Finance · AI Finance Operations</title>
+  <meta name="description" content="AI that takes you from transaction to close to decision. Storm Finance automates your month-end close, FP&A, and board reporting — in one layer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── PIN SCREEN ── */
-#pinscreen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
-#pinscreen .pin-logo{font-size:40px;margin-bottom:20px}
-#pinscreen h2{font-size:22px;font-weight:800;margin-bottom:6px}
-#pinscreen p{color:var(--muted);font-size:14px;margin-bottom:32px}
-.pin-dots{display:flex;gap:16px;margin-bottom:32px}
-.pin-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .15s}
-.pin-dot.filled{background:var(--accent);border-color:var(--accent)}
-.pin-dot.error{background:var(--danger);border-color:var(--danger)}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px}
-.pin-key{height:70px;border-radius:16px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:24px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .1s;display:flex;align-items:center;justify-content:center}
-.pin-key:active{background:var(--accent);color:#111;transform:scale(.95)}
-.pin-key.del{font-size:18px;color:var(--muted)}
-.pin-key.empty{background:transparent;border-color:transparent;cursor:default}
-.pin-error{color:var(--danger);font-size:13px;margin-top:-20px;margin-bottom:20px;height:18px;text-align:center}
+    :root {
+      --navy:   #0B1120;
+      --navy2:  #111827;
+      --navy3:  #1a2540;
+      --blue:   #3B82F6;
+      --blue2:  #2563EB;
+      --teal:   #06B6D4;
+      --white:  #FFFFFF;
+      --grey:   #94A3B8;
+      --light:  #F1F5F9;
+      --border: rgba(255,255,255,0.08);
+    }
 
-/* Topbar */
-#topbar{background:var(--surface);border-bottom:1px solid var(--border);padding-top:52px;padding-left:16px;padding-right:16px;padding-bottom:10px;flex-shrink:0}
-@supports(padding-top: env(safe-area-inset-top)){#topbar{padding-top:max(52px,calc(env(safe-area-inset-top) + 12px))}}
-.topbar-row1{display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:17px;font-weight:800;letter-spacing:-.5px}.logo span{color:var(--accent)}
-.date-chip{font-size:11px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 10px}
-.topbar-row2{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
-.mode-toggle{display:flex;background:var(--card);border-radius:20px;padding:3px;gap:2px;border:1px solid var(--border)}
-.mode-btn{padding:5px 10px;border-radius:16px;border:none;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);-webkit-tap-highlight-color:transparent}
-.mode-btn.active{background:var(--accent);color:#111}
-.meta-chip{font-size:11px;color:var(--muted)}
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--white); line-height: 1.6; -webkit-font-smoothing: antialiased; }
 
-/* Content */
-#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.panel{display:none;padding:14px;padding-bottom:calc(80px + var(--safe-bottom));min-height:100%}
-.panel.active{display:block}
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(11,17,32,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.02em; }
+    .nav-logo span { color: var(--teal); }
+    .nav-cta {
+      background: var(--blue); color: var(--white);
+      padding: 0.55rem 1.25rem; border-radius: 8px;
+      font-size: 0.875rem; font-weight: 600; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--blue2); }
 
-/* Tabbar */
-#tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);z-index:100}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 4px;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;font-weight:600;transition:color .15s;-webkit-tap-highlight-color:transparent}
-.tab-btn.active{color:var(--accent)}
-.tab-btn svg{width:21px;height:21px}
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 1.5rem 5rem;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 70%);
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--teal);
+      border: 1px solid rgba(6,182,212,0.3);
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      margin-bottom: 2rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      max-width: 820px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 em { font-style: normal; color: var(--teal); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--grey);
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 4rem; }
+    .btn-primary {
+      background: var(--blue); color: var(--white);
+      padding: 0.85rem 2rem; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--blue2); transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent; color: var(--white);
+      padding: 0.85rem 2rem; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.5); }
 
-/* API screen */
-#apiscreen{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
-#apiscreen h2{font-size:22px;font-weight:800;margin-bottom:8px;text-align:center}
-#apiscreen p{color:var(--muted);font-size:14px;text-align:center;line-height:1.5;margin-bottom:24px}
-#apiscreen input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;font-family:monospace}
-#apiscreen input:focus{border-color:var(--accent)}
-.primary-btn{width:100%;background:var(--accent);color:#111;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer}
-#apiscreen .skip{color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;cursor:pointer;text-align:center}
-#apiscreen .note{font-size:11px;color:var(--muted);margin-top:18px;text-align:center;line-height:1.6}
+    /* METRICS ROW */
+    .metrics {
+      display: flex; gap: 3rem; flex-wrap: wrap; justify-content: center;
+      border-top: 1px solid var(--border);
+      padding-top: 3rem;
+      width: 100%; max-width: 700px;
+    }
+    .metric-item { text-align: center; }
+    .metric-num { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; color: var(--white); }
+    .metric-label { font-size: 0.8rem; color: var(--grey); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.06em; }
 
-.section-hdr{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin:18px 0 8px}
-.section-hdr:first-child{margin-top:0}
+    /* SECTION COMMONS */
+    section { padding: 6rem 1.5rem; }
+    .container { max-width: 1080px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+    .section-body { font-size: 1.05rem; color: var(--grey); line-height: 1.75; max-width: 620px; }
 
-/* Morning briefing */
-#briefing-panel{background:linear-gradient(135deg,#1a1f35 0%,#0F1117 100%);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
-.briefing-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.briefing-title{font-size:15px;font-weight:700}
-.briefing-btn{background:var(--accent);color:#111;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.briefing-btn:disabled{opacity:.5}
-.briefing-content{font-size:14px;color:var(--text);line-height:1.65;white-space:pre-wrap}
-.briefing-empty{font-size:13px;color:var(--muted);text-align:center;padding:6px 0}
+    /* PROBLEM */
+    .problem { background: var(--navy2); }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+      margin-top: 3.5rem;
+    }
+    .problem-card {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem;
+    }
+    .problem-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .problem-card ul { list-style: none; }
+    .problem-card ul li {
+      font-size: 0.92rem; color: var(--grey); padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .problem-card ul li:last-child { border-bottom: none; }
+    .problem-card ul li::before { content: "—"; color: var(--blue); flex-shrink: 0; }
+    .problem-stat {
+      margin-top: 2.5rem;
+      background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 16px; padding: 2rem 2.5rem;
+      display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
+    }
+    .problem-stat-num { font-size: 3rem; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+    .problem-stat-text { font-size: 1rem; color: var(--grey); line-height: 1.6; }
+    .problem-stat-text strong { color: var(--white); }
 
-.today-event{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:7px}
-.event-bar{width:3px;height:32px;border-radius:2px;flex-shrink:0}
-.event-body .event-title{font-size:14px;font-weight:600}
-.event-body .event-time{font-size:12px;color:var(--muted);margin-top:2px}
+    /* SOLUTION */
+    .solution-flow {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+      margin-top: 3.5rem; position: relative;
+    }
+    .flow-step {
+      text-align: center; padding: 2rem 1rem;
+      position: relative;
+    }
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute; right: -0.75rem; top: 50%; transform: translateY(-60%);
+      font-size: 1.5rem; color: var(--blue);
+    }
+    .flow-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem; font-size: 1.5rem;
+    }
+    .flow-step h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .flow-step p { font-size: 0.82rem; color: var(--grey); line-height: 1.5; }
 
-.filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
-.filter-row::-webkit-scrollbar{display:none}
-.filter-btn{padding:5px 13px;border-radius:20px;border:none;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;background:var(--card);color:var(--muted);-webkit-tap-highlight-color:transparent}
-.filter-btn.active{background:var(--accent);color:#111}
+    /* SYSTEMS */
+    .systems-row {
+      display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2.5rem;
+    }
+    .system-pill {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 999px; padding: 0.5rem 1.25rem;
+      font-size: 0.85rem; font-weight: 600; color: var(--grey);
+    }
 
-.quick-add{display:flex;gap:8px;margin-bottom:12px}
-.quick-add input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;font-family:inherit}
-.quick-add input:focus{border-color:var(--accent)}
-.quick-add button{background:var(--accent);color:#111;border:none;border-radius:12px;padding:0 18px;font-weight:700;font-size:20px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    /* PROOF */
+    .proof { background: var(--navy2); }
+    .proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3.5rem; }
+    .proof-card {
+      background: var(--navy); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2.5rem; overflow: hidden; position: relative;
+    }
+    .proof-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+    }
+    .proof-tag {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 0.5rem;
+    }
+    .proof-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .proof-card .proof-sub { font-size: 0.82rem; color: var(--grey); margin-bottom: 1.5rem; }
+    .proof-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+    .proof-metric { background: rgba(59,130,246,0.07); border-radius: 10px; padding: 1rem; }
+    .proof-metric-num { font-size: 1.5rem; font-weight: 800; color: var(--white); }
+    .proof-metric-label { font-size: 0.75rem; color: var(--grey); margin-top: 0.2rem; }
+    .proof-arrow {
+      font-size: 0.8rem; color: var(--grey); padding-top: 1rem;
+      border-top: 1px solid var(--border); line-height: 1.5;
+    }
+    .proof-arrow strong { color: var(--white); }
 
-.task-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px}
-.task-form input,.task-form select,.task-form textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit;margin-bottom:8px;appearance:none;-webkit-appearance:none}
-.task-form textarea{resize:none}
-.task-form input:focus,.task-form select:focus,.task-form textarea:focus{border-color:var(--accent)}
-.task-form select option{background:var(--surface)}
-.form-row{display:flex;gap:8px}.form-row>*{flex:1}
-.form-btns{display:flex;gap:8px;margin-top:6px}
-.form-btn{flex:1;padding:11px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.form-btn.primary{background:var(--accent);color:#111}
-.form-btn.secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
-.cat-selector{display:flex;gap:6px;margin-bottom:8px}
-.cat-pill{padding:7px 14px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:transparent;-webkit-tap-highlight-color:transparent;transition:all .15s}
-.cat-pill.work{color:var(--work)}.cat-pill.work.sel{background:var(--work);color:#fff;border-color:var(--work)}
-.cat-pill.personal{color:var(--personal)}.cat-pill.personal.sel{background:var(--personal);color:#fff;border-color:var(--personal)}
-.cat-pill.investing{color:var(--investing)}.cat-pill.investing.sel{background:var(--investing);color:#fff;border-color:var(--investing)}
-.tag-selector-wrap{margin-bottom:8px}
-.tag-selector-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
-.tag-pills{display:flex;flex-wrap:wrap;gap:6px;min-height:10px}
-.tag-pick-pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--muted);-webkit-tap-highlight-color:transparent;transition:all .15s}
-.tag-pick-pill.sel{background:var(--accent);color:#111;border-color:var(--accent)}
-.tag-add-inline{display:flex;gap:6px;margin-top:6px}
-.tag-add-inline input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;font-family:inherit}
-.tag-add-inline input:focus{border-color:var(--accent)}
-.tag-add-inline button{background:var(--card);border:1px solid var(--border);color:var(--accent);border-radius:8px;padding:0 12px;font-size:18px;cursor:pointer}
+    /* PRIVACY */
+    .privacy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3.5rem; }
+    .privacy-card {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.75rem;
+    }
+    .privacy-card .icon { font-size: 1.75rem; margin-bottom: 1rem; }
+    .privacy-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .privacy-card p { font-size: 0.85rem; color: var(--grey); line-height: 1.6; }
+    .privacy-tagline {
+      margin-top: 2.5rem; text-align: center;
+      font-size: 1.05rem; color: var(--grey); font-style: italic;
+    }
+    .privacy-tagline strong { color: var(--white); }
 
-.todo-item{display:flex;align-items:flex-start;gap:10px;padding:12px 13px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:7px;transition:opacity .2s}
-.todo-item.done{opacity:.35;background:transparent;border-color:transparent}
-.check-btn{width:22px;height:22px;border-radius:6px;border:2px solid var(--muted);background:transparent;cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
-.check-btn.checked{background:var(--success);border-color:var(--success)}
-.todo-body{flex:1;min-width:0}
-.todo-title-row{font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.todo-title-row.strikethrough{text-decoration:line-through;color:var(--muted)}
-.priority-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.todo-meta{display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap}
-.cat-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid}
-.cat-badge.work{color:var(--work);border-color:var(--work)}
-.cat-badge.personal{color:var(--personal);border-color:var(--personal)}
-.cat-badge.investing{color:var(--investing);border-color:var(--investing)}
-.tag-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--surface);color:var(--muted);border:1px solid var(--border)}
-.todo-due{font-size:11px;color:var(--muted)}
-.todo-due.overdue{color:var(--danger)}
-.recurring-badge{font-size:10px;color:var(--muted)}
-.note-meta-btn{background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;padding:2px 5px;border-radius:8px;-webkit-tap-highlight-color:transparent;transition:all .15s}
-.note-meta-btn:active{background:var(--accent-dim);color:var(--accent)}
-.del-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent}
-.empty-state{text-align:center;color:var(--muted);margin-top:50px;font-size:14px;line-height:2}
+    /* FOUNDER */
+    .founder { background: var(--navy2); }
+    .founder-inner {
+      display: grid; grid-template-columns: auto 1fr; gap: 3rem; align-items: start;
+    }
+    .founder-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .founder-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .founder-role { font-size: 0.9rem; color: var(--teal); font-weight: 600; margin-bottom: 0.5rem; }
+    .founder-trail { font-size: 0.82rem; color: var(--grey); margin-bottom: 1.5rem; }
+    .founder-bio { font-size: 0.97rem; color: var(--grey); line-height: 1.75; }
+    .founder-bio strong { color: var(--white); }
 
-/* Tags section (inside Notes panel) */
-.tags-section{margin-bottom:24px}
-.tags-cat-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.tags-cat-dot{width:10px;height:10px;border-radius:50%}
-.tags-cat-label{font-size:14px;font-weight:700}
-.tags-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.manage-tag{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 12px}
-.manage-tag span{font-size:13px;font-weight:500}
-.manage-tag button{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;padding:0;-webkit-tap-highlight-color:transparent}
-.add-tag-row{display:flex;gap:8px}
-.add-tag-row input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
-.add-tag-row input:focus{border-color:var(--accent)}
-.add-tag-row button{background:var(--accent);color:#111;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:18px;cursor:pointer}
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(59,130,246,0.12) 0%, transparent 70%);
+      border-top: 1px solid var(--border);
+    }
+    .cta-section h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; }
+    .cta-section p { font-size: 1.05rem; color: var(--grey); max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.7; }
+    .cta-email { display: block; font-size: 0.9rem; color: var(--grey); margin-top: 1.5rem; }
+    .cta-email a { color: var(--teal); text-decoration: none; }
+    .cta-email a:hover { text-decoration: underline; }
 
-/* Notes */
-.note-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:8px}
-.note-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px}
-.note-title{font-size:14px;font-weight:700;flex:1;line-height:1.3}
-.note-body{font-size:14px;color:var(--text);line-height:1.6;cursor:pointer;word-break:break-word;white-space:pre-wrap}
-.note-body.collapsed{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.note-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
-.note-task-link{font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;padding:2px 8px;background:rgba(74,158,245,.1);border-radius:10px;border:1px solid rgba(74,158,245,.3);-webkit-tap-highlight-color:transparent}
-.note-date{font-size:11px;color:var(--muted)}
-.note-task-chip-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(74,158,245,.1);border:1px solid rgba(74,158,245,.3);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--blue);margin-bottom:8px}
-.note-task-chip-pill button{background:none;border:none;color:var(--blue);cursor:pointer;font-size:14px;line-height:1;padding:0}
-.tag-mgr-toggle{background:none;border:none;cursor:pointer;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 0;-webkit-tap-highlight-color:transparent}
-.tag-mgr-toggle:hover{color:var(--text)}
+    /* FOOTER */
+    footer {
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-size: 0.95rem; font-weight: 800; }
+    .footer-logo span { color: var(--teal); }
+    .footer-note { font-size: 0.8rem; color: var(--grey); }
+    .footer-trust {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .trust-badge {
+      font-size: 0.72rem; font-weight: 600; color: var(--grey);
+      border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.7rem;
+    }
 
-/* Calendar */
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.cal-nav{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 16px;font-size:18px;cursor:pointer}
-.cal-title{font-size:16px;font-weight:700}
-.cal-daynames{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
-.cal-dayname{text-align:center;font-size:11px;color:var(--muted);font-weight:600;padding-bottom:4px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.cal-cell{min-height:50px;border-radius:10px;padding:5px 4px;cursor:pointer;background:var(--card);border:1px solid var(--border);-webkit-tap-highlight-color:transparent}
-.cal-cell.empty{background:transparent;border-color:transparent;cursor:default}
-.cal-cell.today{border-color:var(--accent)}
-.cal-cell.selected{background:var(--accent-dim);border-color:var(--accent)}
-.cal-day-num{font-size:13px;font-weight:500}
-.cal-cell.today .cal-day-num{color:var(--accent);font-weight:700}
-.cal-dots{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap}
-.cal-dot{width:5px;height:5px;border-radius:50%}
-.day-detail{margin-top:12px;background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border)}
-.day-detail-title{font-weight:700;font-size:14px;margin-bottom:10px}
-.event-item{display:flex;gap:10px;align-items:center;background:var(--surface);border-radius:10px;padding:10px 12px;margin-bottom:7px}
-.event-item .event-bar{width:3px;height:36px;border-radius:2px;flex-shrink:0}
-.event-item .event-body{flex:1}
-.event-item .event-title{font-size:14px;font-weight:600}
-.event-item .event-time{font-size:12px;color:var(--muted);margin-top:2px}
-.event-item .event-note{font-size:12px;color:var(--muted);margin-top:2px}
-.event-add-form{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.event-add-form input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
-.event-add-form input:focus{border-color:var(--accent)}
-.event-add-form button{background:var(--accent);color:#111;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:15px;cursor:pointer}
-
-/* GCal sync */
-.gcal-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 14px;margin-bottom:14px}
-.gcal-row{display:flex;align-items:center;justify-content:space-between}
-.gcal-info{display:flex;align-items:center;gap:8px}
-.gcal-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
-.gcal-label{font-size:13px;font-weight:600}
-.gcal-time{font-size:11px;color:var(--muted);margin-top:2px}
-.gcal-btns{display:flex;gap:6px}
-.gcal-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.gcal-btn.primary{background:var(--accent);color:#111;border-color:var(--accent)}
-.gcal-setup{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.gcal-setup-note{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px}
-.gcal-setup-note strong{color:var(--text)}
-.gcal-ics-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:13px;outline:none;font-family:monospace;margin-bottom:8px}
-.gcal-ics-input:focus{border-color:var(--accent)}
-
-/* Chat */
-#chat-messages{display:flex;flex-direction:column;gap:10px;padding-bottom:16px}
-.msg{display:flex}.msg.user{justify-content:flex-end}
-.bubble{max-width:82%;padding:11px 15px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
-.msg.user .bubble{background:var(--accent);color:#111;border-radius:18px 18px 4px 18px;font-weight:500}
-.msg.assistant .bubble{background:var(--card);color:var(--text);border-radius:18px 18px 18px 4px;border:1px solid var(--border)}
-#chat-input-wrap{position:fixed;bottom:calc(58px + var(--safe-bottom));left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 12px;display:flex;gap:8px;z-index:99}
-#chat-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:11px 16px;color:var(--text);font-size:15px;outline:none;font-family:inherit;resize:none;max-height:100px;overflow-y:auto}
-#chat-input:focus{border-color:var(--accent)}
-#send-btn{width:44px;height:44px;border-radius:22px;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end}
-#send-btn:disabled{opacity:.4}
-
-#toast{position:fixed;top:calc(var(--safe-top) + 60px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--success);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;pointer-events:none}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-</style>
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 1rem; }
+      .problem-grid { grid-template-columns: 1fr; }
+      .solution-flow { grid-template-columns: 1fr 1fr; }
+      .flow-step:nth-child(2)::after { display: none; }
+      .proof-grid { grid-template-columns: 1fr; }
+      .privacy-grid { grid-template-columns: 1fr; }
+      .founder-inner { grid-template-columns: 1fr; }
+      .founder-avatar { width: 72px; height: 72px; font-size: 1.6rem; }
+      footer { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .solution-flow { grid-template-columns: 1fr; }
+      .flow-step::after { display: none; }
+      .proof-metrics { grid-template-columns: 1fr; }
+      .metrics { gap: 1.5rem; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- PIN Screen -->
-<div id="pinscreen">
-  <div class="pin-logo">🔐</div>
-  <h2>Personal Agent</h2>
-  <p>Enter your PIN to continue</p>
-  <div class="pin-dots" id="pin-dots">
-    <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
-    <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
-  </div>
-  <div class="pin-error" id="pin-error"></div>
-  <div class="pin-pad">
-    <button class="pin-key" onclick="pinKey('1')">1</button>
-    <button class="pin-key" onclick="pinKey('2')">2</button>
-    <button class="pin-key" onclick="pinKey('3')">3</button>
-    <button class="pin-key" onclick="pinKey('4')">4</button>
-    <button class="pin-key" onclick="pinKey('5')">5</button>
-    <button class="pin-key" onclick="pinKey('6')">6</button>
-    <button class="pin-key" onclick="pinKey('7')">7</button>
-    <button class="pin-key" onclick="pinKey('8')">8</button>
-    <button class="pin-key" onclick="pinKey('9')">9</button>
-    <button class="pin-key empty"></button>
-    <button class="pin-key" onclick="pinKey('0')">0</button>
-    <button class="pin-key del" onclick="pinDel()">⌫</button>
-  </div>
-</div>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">STORM <span>FINANCE</span>.ai</div>
+  <a href="mailto:Sriram@stormfinance.ai" class="nav-cta">Book a Demo</a>
+</nav>
 
-<!-- API Key Screen -->
-<div id="apiscreen" style="display:none">
-  <div style="font-size:36px;margin-bottom:16px">◆</div>
-  <h2>Personal Agent</h2>
-  <p>Enter your Anthropic API key to enable AI features. Tasks & calendar work without it.</p>
-  <input type="password" id="api-key-input" placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false">
-  <button class="primary-btn" onclick="saveApiKey()">Get Started</button>
-  <div class="skip" onclick="skipApiKey()">Skip — use tasks & calendar only</div>
-  <div class="note">Stored only on this device · ~₹5–10/month<br>Get a key at console.anthropic.com</div>
-</div>
-
-<div id="app" style="display:none">
-  <div id="topbar">
-    <div class="topbar-row1">
-      <div class="logo"><span>◆</span> Personal Agent</div>
-      <div class="date-chip" id="top-date"></div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">AI Finance Operations · Now Live</div>
+  <h1>From transaction to <em>close</em> to decision.</h1>
+  <p class="hero-sub">Storm Finance sits between your accounting systems and your board — automating the entire month-end journey. No more 10-day closes. No more data plumbing.</p>
+  <div class="hero-actions">
+    <a href="mailto:Sriram@stormfinance.ai" class="btn-primary">Book a Demo</a>
+    <a href="#proof" class="btn-secondary">See Results →</a>
+  </div>
+  <div class="metrics">
+    <div class="metric-item">
+      <div class="metric-num">$250K</div>
+      <div class="metric-label">Capital Unlocked</div>
     </div>
-    <div class="topbar-row2">
-      <div class="mode-toggle">
-        <button class="mode-btn active" onclick="setMode('all',this)">All</button>
-        <button class="mode-btn" onclick="setMode('work',this)">Work</button>
-        <button class="mode-btn" onclick="setMode('personal',this)">Personal</button>
-        <button class="mode-btn" onclick="setMode('investing',this)">Investing</button>
-      </div>
-      <div class="meta-chip" id="meta-tasks">—</div>
+    <div class="metric-item">
+      <div class="metric-num">3 FTE</div>
+      <div class="metric-label">Productivity Gained</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-num">T+0</div>
+      <div class="metric-label">Day Close</div>
     </div>
   </div>
+</section>
 
-  <div id="content">
-    <!-- TODAY -->
-    <div class="panel active" id="panel-today">
-      <div id="briefing-panel">
-        <div class="briefing-header">
-          <div class="briefing-title">☀️ Morning Briefing</div>
-          <button class="briefing-btn" id="briefing-btn" onclick="generateBriefing()">Generate</button>
-        </div>
-        <div id="briefing-content"><div class="briefing-empty">Tap Generate for your AI daily briefing</div></div>
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">Month-end close is still broken.</h2>
+    <p class="section-body">Every source — invoices, bank statements, payroll, expenses — requires a separate manual export. Nothing connects automatically. Your finance team spends weeks on data plumbing instead of analysis.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h3>For CEOs &amp; Founders</h3>
+        <ul>
+          <li>Decisions made on 15-day-old data</li>
+          <li>Board meetings built on stale numbers</li>
+          <li>Cash blind spots, every month</li>
+          <li>No real-time view of business health</li>
+        </ul>
       </div>
-      <div class="section-hdr">Due Today & Overdue</div>
-      <div id="today-tasks"></div>
-      <div class="section-hdr">Today's Events</div>
-      <div id="today-events"></div>
+      <div class="problem-card">
+        <h3>For Finance Teams</h3>
+        <ul>
+          <li>Manual reconciliations consume weeks</li>
+          <li>No audit trail — errors surface days later</li>
+          <li>One data entry error ripples across reports</li>
+          <li>No time left for analysis or forecasting</li>
+        </ul>
+      </div>
     </div>
-
-    <!-- TASKS -->
-    <div class="panel" id="panel-tasks">
-      <div class="quick-add">
-        <input type="text" id="quick-task-input" placeholder="Quick add task…" autocomplete="off">
-        <button onclick="toggleTaskForm()">+</button>
+    <div class="problem-stat">
+      <div class="problem-stat-num">T+15</div>
+      <div class="problem-stat-text">
+        <strong>The median month-end close takes 10–15 days.</strong><br />
+        That's half the month your CEO is flying blind — and your best finance talent is buried in copy-paste.
       </div>
-      <div id="task-form-wrap" style="display:none">
-        <div class="task-form">
-          <input type="text" id="tf-title" placeholder="Task title">
-          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Category</div>
-          <div class="cat-selector">
-            <button class="cat-pill work sel" onclick="selectCat('work',this)">💼 Work</button>
-            <button class="cat-pill personal" onclick="selectCat('personal',this)">🏠 Personal</button>
-            <button class="cat-pill investing" onclick="selectCat('investing',this)">📈 Investing</button>
-          </div>
-          <div class="tag-selector-wrap">
-            <div class="tag-selector-label">Tag (optional)</div>
-            <div class="tag-pills" id="tag-pills"></div>
-            <div class="tag-add-inline">
-              <input type="text" id="inline-tag-input" placeholder="New tag…" autocomplete="off">
-              <button onclick="inlineAddTag()">+</button>
-            </div>
-          </div>
-          <div class="form-row">
-            <select id="tf-priority">
-              <option value="high">🔴 High</option>
-              <option value="medium" selected>🟡 Medium</option>
-              <option value="low">🟢 Low</option>
-            </select>
-            <select id="tf-recurring">
-              <option value="">Not recurring</option>
-              <option value="daily">🔁 Daily</option>
-              <option value="weekly">🔁 Weekly</option>
-            </select>
-          </div>
-          <input type="date" id="tf-due" style="color-scheme:dark">
-          <div class="form-btns">
-            <button class="form-btn secondary" onclick="toggleTaskForm()">Cancel</button>
-            <button class="form-btn primary" onclick="addTaskFromForm()">Add Task</button>
-          </div>
-        </div>
-      </div>
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-        <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
-        <button class="filter-btn" onclick="setFilter('done',this)">Done</button>
-        <button class="filter-btn" onclick="setFilter('high',this)">🔴 High</button>
-        <button class="filter-btn" onclick="setFilter('overdue',this)">Overdue</button>
-      </div>
-      <div class="filter-row" id="tag-filter-row"></div>
-      <div id="todo-list"></div>
     </div>
+  </div>
+</section>
 
-    <!-- CALENDAR -->
-    <div class="panel" id="panel-calendar">
-      <!-- Google Calendar Sync -->
-      <div class="gcal-card">
-        <div class="gcal-row">
-          <div class="gcal-info">
-            <div class="gcal-dot" id="gcal-dot"></div>
-            <div>
-              <div class="gcal-label">Google Calendar</div>
-              <div class="gcal-time" id="gcal-sync-time">Not synced</div>
-            </div>
-          </div>
-          <div class="gcal-btns">
-            <button class="gcal-btn" onclick="toggleGcalSetup()">⚙</button>
-            <button class="gcal-btn primary" id="gcal-sync-btn" onclick="syncGCal()">⟳ Sync</button>
-          </div>
-        </div>
-        <div class="gcal-setup" id="gcal-setup" style="display:none">
-          <div class="gcal-setup-note">
-            In Google Calendar → Settings → your calendar → <em>Integrate calendar</em> → copy the <strong>Secret address in iCal format</strong>
-          </div>
-          <input type="url" class="gcal-ics-input" id="gcal-ics-input" placeholder="https://calendar.google.com/calendar/ical/…" autocomplete="off">
-          <div class="form-btns">
-            <button class="form-btn secondary" onclick="toggleGcalSetup()">Cancel</button>
-            <button class="form-btn primary" onclick="saveGcalUrl()">Save & Sync</button>
-          </div>
-        </div>
+<!-- SOLUTION -->
+<section>
+  <div class="container">
+    <div class="section-label">The Solution</div>
+    <h2 class="section-title">One AI layer. Every financial workflow.</h2>
+    <p class="section-body">Storm Finance connects to your existing systems, normalizes your data, runs reconciliations automatically, and produces your board pack — continuously.</p>
+    <div class="solution-flow">
+      <div class="flow-step">
+        <div class="flow-icon">⚡</div>
+        <h3>Data Ingestion</h3>
+        <p>Auto-pulls from Tally, QuickBooks, banks, AP, AR, payroll — normalized in one layer.</p>
       </div>
-
-      <div class="cal-header">
-        <button class="cal-nav" onclick="calNav(-1)">‹</button>
-        <div class="cal-title" id="cal-title"></div>
-        <button class="cal-nav" onclick="calNav(1)">›</button>
+      <div class="flow-step">
+        <div class="flow-icon">🔄</div>
+        <h3>Smart Close</h3>
+        <p>AR/AP reconciliations, accruals, treasury — exception-led review, not every-line review.</p>
       </div>
-      <div class="cal-daynames">
-        <div class="cal-dayname">Su</div><div class="cal-dayname">Mo</div>
-        <div class="cal-dayname">Tu</div><div class="cal-dayname">We</div>
-        <div class="cal-dayname">Th</div><div class="cal-dayname">Fr</div>
-        <div class="cal-dayname">Sa</div>
+      <div class="flow-step">
+        <div class="flow-icon">📊</div>
+        <h3>FP&amp;A Layer</h3>
+        <p>Budget vs actuals, variance analysis, 13-week cash forecasting, liquidity alerts.</p>
       </div>
-      <div class="cal-grid" id="cal-grid"></div>
-      <div id="day-detail"></div>
+      <div class="flow-step">
+        <div class="flow-icon">📋</div>
+        <h3>Board Pack</h3>
+        <p>MIS reports, investor-ready financials — IND AS, IFRS, US GAAP. Delivered automatically.</p>
+      </div>
     </div>
+    <div class="systems-row" style="margin-top:3rem;">
+      <span style="font-size:0.82rem;color:var(--grey);align-self:center;">Works with:</span>
+      <span class="system-pill">Tally</span>
+      <span class="system-pill">QuickBooks</span>
+      <span class="system-pill">Zoho Books</span>
+      <span class="system-pill">Xero</span>
+      <span class="system-pill">Banks &amp; UPI</span>
+      <span class="system-pill">+ more</span>
+    </div>
+  </div>
+</section>
 
-    <!-- NOTES (replaces Tags, includes tag manager at bottom) -->
-    <div class="panel" id="panel-notes">
-      <!-- Quick add -->
-      <div class="quick-add">
-        <input type="text" id="note-title-inp" placeholder="Note title (optional)…" autocomplete="off">
-        <button onclick="toggleNoteForm()">+</button>
-      </div>
-
-      <!-- Note form -->
-      <div id="note-form-wrap" style="display:none">
-        <div class="task-form">
-          <textarea id="note-body" rows="4" placeholder="Write your note…"></textarea>
-          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Link to Task</div>
-          <select id="note-task-link-sel" onchange="noteLinkedTaskId=this.value||null">
-            <option value="">No task linked</option>
-          </select>
-          <div class="tag-selector-wrap" style="margin-top:4px">
-            <div class="tag-selector-label">Tags</div>
-            <div class="tag-pills" id="note-tag-pills"></div>
+<!-- PROOF -->
+<section class="proof" id="proof">
+  <div class="container">
+    <div class="section-label">Proof</div>
+    <h2 class="section-title">Two companies. Two continents. Real results.</h2>
+    <p class="section-body">Storm Finance is live with real customers — different systems, different geographies, the same underlying problem solved.</p>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="proof-tag">🇺🇸 United States</div>
+        <h3>B2B SaaS Company</h3>
+        <p class="proof-sub">$5M Revenue · Low transaction volume · Broad accounting validation</p>
+        <div class="proof-metrics">
+          <div class="proof-metric">
+            <div class="proof-metric-num">$150K</div>
+            <div class="proof-metric-label">Capital Unlocked</div>
           </div>
-          <div class="form-btns" style="margin-top:10px">
-            <button class="form-btn secondary" onclick="toggleNoteForm()">Cancel</button>
-            <button class="form-btn primary" onclick="addNote()">Add Note</button>
+          <div class="proof-metric">
+            <div class="proof-metric-num">7 Days</div>
+            <div class="proof-metric-label">AR Days Reduced</div>
+          </div>
+          <div class="proof-metric">
+            <div class="proof-metric-num">5 Days</div>
+            <div class="proof-metric-label">Faster Month-End</div>
+          </div>
+          <div class="proof-metric">
+            <div class="proof-metric-num">~0</div>
+            <div class="proof-metric-label">Days to Close</div>
           </div>
         </div>
+        <p class="proof-arrow"><strong>Before:</strong> Manual AR aging, inconsistent invoice matching, heavy month-end cleanup.<br/><strong>After:</strong> Exception-led review. Team focuses on outliers, not every line.</p>
       </div>
+      <div class="proof-card">
+        <div class="proof-tag">🇮🇳 India</div>
+        <h3>Reverse Logistics Company</h3>
+        <p class="proof-sub">$3.5M Revenue · 5,000+ monthly transactions · Operationally intensive</p>
+        <div class="proof-metrics">
+          <div class="proof-metric">
+            <div class="proof-metric-num">$100K</div>
+            <div class="proof-metric-label">Capital Unlocked</div>
+          </div>
+          <div class="proof-metric">
+            <div class="proof-metric-num">10%</div>
+            <div class="proof-metric-label">Vendor Cost Savings</div>
+          </div>
+          <div class="proof-metric">
+            <div class="proof-metric-num">3 FTE</div>
+            <div class="proof-metric-label">Productivity Gained</div>
+          </div>
+          <div class="proof-metric">
+            <div class="proof-metric-num">100+</div>
+            <div class="proof-metric-label">Vendors Consolidated</div>
+          </div>
+        </div>
+        <p class="proof-arrow"><strong>Before:</strong> 100+ fragmented vendors, missed accruals, cash-based reporting masking true P&amp;L.<br/><strong>After:</strong> Accrual-based reporting, consolidated spend, proactive vendor renegotiation.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <!-- Active task filter chip -->
-      <div id="note-task-chip"></div>
+<!-- PRIVACY -->
+<section>
+  <div class="container">
+    <div class="section-label">Privacy &amp; Trust</div>
+    <h2 class="section-title">Your data never leaves your boundary.</h2>
+    <p class="section-body">CFOs entrust Storm Finance with their most sensitive data. That trust is the product — not an afterthought.</p>
+    <div class="privacy-grid">
+      <div class="privacy-card">
+        <div class="icon">🔒</div>
+        <h3>Zero Data Pooling</h3>
+        <p>Each customer's financial data is fully isolated. Your books are never combined with or compared against another customer's data.</p>
+      </div>
+      <div class="privacy-card">
+        <div class="icon">🧠</div>
+        <h3>Never Trains Our AI</h3>
+        <p>Your transactions, reconciliations, and reports are never used to train Storm Finance's AI models. Your data improves only your own intelligence.</p>
+      </div>
+      <div class="privacy-card">
+        <div class="icon">🛡️</div>
+        <h3>SOC 2 · ISO 27001</h3>
+        <p>Third-party validated security — not self-certified. Enterprise-grade access controls, audit logging, and encryption at rest and in transit.</p>
+      </div>
+    </div>
+    <p class="privacy-tagline">"<strong>Your data. Your boundary. Your AI.</strong>" — Storm Finance processes your financials without pooling, sharing, or learning from them.</p>
+  </div>
+</section>
 
-      <!-- Tag filter row -->
-      <div class="filter-row" id="note-filter-row"></div>
-
-      <!-- Notes list -->
-      <div id="notes-list"></div>
-
-      <!-- Collapsible tag manager -->
-      <div style="margin-top:28px;border-top:1px solid var(--border);padding-top:4px">
-        <button class="tag-mgr-toggle" onclick="toggleTagManager()">
-          <span>MANAGE TAGS</span>
-          <span id="tag-mgr-arrow">▼</span>
-        </button>
-        <div id="tags-manager-wrap" style="display:none">
-          <div id="tags-manager"></div>
+<!-- FOUNDER -->
+<section class="founder">
+  <div class="container">
+    <div class="section-label">The Founder</div>
+    <div style="margin-top:2.5rem;">
+      <div class="founder-inner">
+        <div class="founder-avatar">SP</div>
+        <div>
+          <div class="founder-name">Sriram Palepu</div>
+          <div class="founder-role">Founder &amp; CEO, Storm Finance</div>
+          <div class="founder-trail">IIT Kharagpur · McKinsey · Cairn India · Aircel · Knowlarity · CFO, Mercer Mettl</div>
+          <p class="founder-bio">
+            I spent 20 years as a finance leader — most recently as CFO at Mercer Mettl, running a ~$60M global SaaS business. And for 20 years, I watched the same thing break every month: the close.<br/><br/>
+            <strong>10 to 15 days of brilliant finance teams buried in data plumbing.</strong> Reconciling systems that don't talk. Chasing exports. Fixing errors. Producing numbers that were already two weeks old by the time the CEO saw them.<br/><br/>
+            I built Storm Finance because I was the customer. I felt this pain. And I knew nobody was going to fix it unless someone who'd lived it decided to.
+          </p>
         </div>
       </div>
     </div>
-
-    <!-- CHAT -->
-    <div class="panel" id="panel-chat">
-      <div id="chat-messages"></div>
-    </div>
   </div>
+</section>
 
-  <div id="chat-input-wrap" style="display:none">
-    <textarea id="chat-input" rows="1" placeholder="Add task, plan meeting, ask anything…"></textarea>
-    <button id="send-btn" onclick="sendChat()" disabled>
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Ready to close faster?</h2>
+    <p>30 minutes. You describe your close. I'll tell you honestly if Storm can help.</p>
+    <a href="mailto:Sriram@stormfinance.ai" class="btn-primary">Book a Demo</a>
+    <p class="cta-email">Or write directly: <a href="mailto:Sriram@stormfinance.ai">Sriram@stormfinance.ai</a> · <a href="tel:+919810221982">+91 98102 21982</a></p>
   </div>
+</section>
 
-  <div id="tabbar">
-    <button class="tab-btn active" id="tab-today" onclick="switchTab('today')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      Today
-    </button>
-    <button class="tab-btn" id="tab-tasks" onclick="switchTab('tasks')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      Tasks
-    </button>
-    <button class="tab-btn" id="tab-calendar" onclick="switchTab('calendar')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Calendar
-    </button>
-    <button class="tab-btn" id="tab-notes" onclick="switchTab('notes')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-      Notes
-    </button>
-    <button class="tab-btn" id="tab-chat" onclick="switchTab('chat')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Chat
-    </button>
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">STORM <span>FINANCE</span>.ai</div>
+    <div class="footer-note" style="margin-top:0.35rem;">© 2026 Storm Finance. All rights reserved.</div>
   </div>
-</div>
+  <div class="footer-trust">
+    <span class="trust-badge">SOC 2 In Progress</span>
+    <span class="trust-badge">ISO 27001 In Progress</span>
+    <span class="trust-badge">Zero Data Pooling</span>
+  </div>
+</footer>
 
-<div id="toast"></div>
-
-<script>
-const CORRECT_PIN='0810';
-const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
-const today=new Date(), todayStr=today.toISOString().slice(0,10);
-
-// ── PIN ───────────────────────────────────────────────────────────────────────
-let pinEntry='';
-if(sessionStorage.getItem('pa-unlocked')==='1') unlockApp();
-
-function pinKey(k){
-  if(pinEntry.length>=4) return;
-  pinEntry+=k; updatePinDots();
-  if(pinEntry.length===4) setTimeout(checkPin,100);
-}
-function pinDel(){
-  pinEntry=pinEntry.slice(0,-1); updatePinDots();
-  document.getElementById('pin-error').textContent='';
-}
-function updatePinDots(){
-  for(let i=0;i<4;i++){
-    const d=document.getElementById('pd'+i);
-    d.classList.toggle('filled',i<pinEntry.length);
-    d.classList.remove('error');
-  }
-}
-function checkPin(){
-  if(pinEntry===CORRECT_PIN){sessionStorage.setItem('pa-unlocked','1');unlockApp()}
-  else{
-    for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.add('error');
-    document.getElementById('pin-error').textContent='Incorrect PIN. Try again.';
-    setTimeout(()=>{pinEntry='';updatePinDots()},800);
-  }
-}
-function unlockApp(){
-  document.getElementById('pinscreen').style.display='none';
-  const hasKey=localStorage.getItem('pa-apikey');
-  const skipped=localStorage.getItem('pa-skipped');
-  if(hasKey||skipped){document.getElementById('app').style.display='flex'}
-  else{document.getElementById('apiscreen').style.display='flex'}
-}
-
-// ── State ─────────────────────────────────────────────────────────────────────
-let todos   = JSON.parse(localStorage.getItem('pa-todos')||'[]');
-let events  = JSON.parse(localStorage.getItem('pa-events')||'[]');
-let tags    = JSON.parse(localStorage.getItem('pa-tags')||'{"work":[],"personal":[],"investing":[]}');
-let notes   = JSON.parse(localStorage.getItem('pa-notes')||'[]');
-let gcalEvs = JSON.parse(localStorage.getItem('pa-gcal-events')||'[]');
-let apiKey  = localStorage.getItem('pa-apikey')||'';
-let chatHistory=[{role:'assistant',content:'Hi! I\'m your personal agent.\n\nTry:\n• "Add high priority work task: due diligence review by Friday"\n• "Add investing task: review portfolio returns"\n• "Schedule call June 25 at 4pm"\n• "What should I focus on today?"'}];
-let currentFilter='all',currentTagFilter=null,currentMode='all',currentTab='today';
-let calState={year:today.getFullYear(),month:today.getMonth()},selectedDay=todayStr;
-let isSending=false,showTaskForm=false,selectedCat='work',selectedTag=null;
-let showNoteForm=false,noteLinkedTaskId=null,noteSelectedTags=[],noteFilter='all',noteTaskFilter=null,expandedNotes=new Set(),tagMgrOpen=false;
-
-function uid(){return Math.random().toString(36).slice(2,9)}
-function persist(){
-  localStorage.setItem('pa-todos',JSON.stringify(todos));
-  localStorage.setItem('pa-events',JSON.stringify(events));
-  localStorage.setItem('pa-tags',JSON.stringify(tags));
-  localStorage.setItem('pa-notes',JSON.stringify(notes));
-}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
-
-window.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('top-date').textContent=today.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-  processDailyRecurring();
-  updateMeta();renderToday();renderTodos();renderCalendar();renderChat();
-  renderNotes();renderNoteFilterRow();updateGcalStatus();
-  const inp=document.getElementById('chat-input');
-  inp.addEventListener('input',()=>{
-    document.getElementById('send-btn').disabled=!inp.value.trim()||isSending;
-    inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,100)+'px';
-  });
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat()}});
-  document.getElementById('quick-task-input').addEventListener('keydown',e=>{if(e.key==='Enter')quickAddTask()});
-});
-
-function saveApiKey(){
-  const v=document.getElementById('api-key-input').value.trim();
-  if(!v){showToast('Paste your API key first');return}
-  apiKey=v;localStorage.setItem('pa-apikey',v);
-  document.getElementById('apiscreen').style.display='none';
-  document.getElementById('app').style.display='flex';
-}
-function skipApiKey(){
-  localStorage.setItem('pa-skipped','1');
-  document.getElementById('apiscreen').style.display='none';
-  document.getElementById('app').style.display='flex';
-}
-
-function setMode(mode,btn){
-  currentMode=mode;currentTagFilter=null;
-  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');renderToday();renderTodos();renderTagFilterRow();
-}
-function modeFilter(arr){return currentMode==='all'?arr:arr.filter(t=>t.category===currentMode)}
-function updateMeta(){document.getElementById('meta-tasks').textContent=`${modeFilter(todos).filter(t=>!t.done).length} active`}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
-}
-
-function switchTab(tab){
-  currentTab=tab;
-  ['today','tasks','calendar','notes','chat'].forEach(t=>{
-    document.getElementById('panel-'+t).classList.toggle('active',t===tab);
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
-  });
-  document.getElementById('chat-input-wrap').style.display=tab==='chat'?'flex':'none';
-  if(tab==='calendar'){
-    renderCalendar();updateGcalStatus();
-    // Auto-sync if URL set and last sync >1hr ago
-    const lastSync=localStorage.getItem('pa-gcal-sync-time');
-    const stale=!lastSync||(Date.now()-new Date(lastSync).getTime())>3600000;
-    if(localStorage.getItem('pa-gcal-ics')&&stale) syncGCal();
-  }
-  if(tab==='tasks'){renderTodos();refreshTagPills();renderTagFilterRow()}
-  if(tab==='today') renderToday();
-  if(tab==='notes'){renderNotes();renderNoteFilterRow();renderNoteTaskChip();refreshNoteTagPills();refreshNoteTaskDropdown()}
-}
-
-// ── Tags ──────────────────────────────────────────────────────────────────────
-function catColor(cat){return cat==='work'?'var(--work)':cat==='personal'?'var(--personal)':'var(--investing)'}
-function catEmoji(cat){return cat==='work'?'💼':cat==='personal'?'🏠':'📈'}
-function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
-function allTagsList(){return[...new Set([...(tags.work||[]),...(tags.personal||[]),...(tags.investing||[])])]}
-
-function toggleTagManager(){
-  tagMgrOpen=!tagMgrOpen;
-  document.getElementById('tags-manager-wrap').style.display=tagMgrOpen?'block':'none';
-  document.getElementById('tag-mgr-arrow').textContent=tagMgrOpen?'▲':'▼';
-  if(tagMgrOpen) renderTagsManager();
-}
-
-function renderTagsManager(){
-  const el=document.getElementById('tags-manager');if(!el)return;
-  el.innerHTML=['work','personal','investing'].map(cat=>`
-    <div class="tags-section">
-      <div class="tags-cat-header">
-        <div class="tags-cat-dot" style="background:${catColor(cat)}"></div>
-        <div class="tags-cat-label">${catEmoji(cat)} ${cap(cat)}</div>
-      </div>
-      <div class="tags-list">
-        ${(tags[cat]||[]).map(tag=>`<div class="manage-tag"><span>${esc(tag)}</span><button onclick="deleteTag('${cat}','${tag}')">×</button></div>`).join('')}
-        ${!(tags[cat]||[]).length?'<div style="font-size:13px;color:var(--muted)">No tags yet</div>':''}
-      </div>
-      <div class="add-tag-row">
-        <input type="text" id="add-tag-${cat}" placeholder="New ${cat} tag…" autocomplete="off" onkeydown="if(event.key==='Enter')addTag('${cat}')">
-        <button onclick="addTag('${cat}')">+</button>
-      </div>
-    </div>
-    <div style="height:1px;background:var(--border);margin:8px 0 20px"></div>`).join('');
-}
-function addTag(cat){
-  const inp=document.getElementById(`add-tag-${cat}`);
-  const val=inp.value.trim();if(!val)return;
-  if(!tags[cat])tags[cat]=[];
-  if(tags[cat].includes(val)){showToast('Tag already exists');return}
-  tags[cat].push(val);persist();inp.value='';
-  renderTagsManager();renderTagFilterRow();renderNoteFilterRow();refreshNoteTagPills();showToast(`Tag "${val}" added`);
-}
-function deleteTag(cat,tag){
-  tags[cat]=(tags[cat]||[]).filter(t=>t!==tag);
-  todos=todos.map(t=>t.tag===tag&&t.category===cat?{...t,tag:null}:t);
-  notes=notes.map(n=>({...n,tags:(n.tags||[]).filter(t=>t!==tag)}));
-  persist();renderTagsManager();renderTodos();renderTagFilterRow();renderNoteFilterRow();renderNotes();showToast(`Tag "${tag}" deleted`);
-}
-
-// ── Task form ─────────────────────────────────────────────────────────────────
-function selectCat(cat,btn){
-  selectedCat=cat;selectedTag=null;
-  document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');refreshTagPills();
-}
-function refreshTagPills(){
-  const c=document.getElementById('tag-pills');if(!c)return;
-  c.innerHTML=(tags[selectedCat]||[]).map(tag=>`<button class="tag-pick-pill ${selectedTag===tag?'sel':''}" onclick="selectTag('${tag}',this)">${esc(tag)}</button>`).join('');
-}
-function selectTag(tag,btn){
-  if(selectedTag===tag){selectedTag=null;btn.classList.remove('sel')}
-  else{selectedTag=tag;document.querySelectorAll('#tag-pills .tag-pick-pill').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel')}
-}
-function inlineAddTag(){
-  const inp=document.getElementById('inline-tag-input');
-  const val=inp.value.trim();if(!val)return;
-  if(!tags[selectedCat])tags[selectedCat]=[];
-  if(!tags[selectedCat].includes(val))tags[selectedCat].push(val);
-  selectedTag=val;persist();inp.value='';refreshTagPills();showToast(`Tag "${val}" added`);
-}
-function toggleTaskForm(){
-  showTaskForm=!showTaskForm;
-  document.getElementById('task-form-wrap').style.display=showTaskForm?'block':'none';
-  if(showTaskForm){selectedCat='work';selectedTag=null;refreshTagPills();document.getElementById('tf-title').focus()}
-}
-function addTaskFromForm(){
-  const title=document.getElementById('tf-title').value.trim();
-  if(!title){showToast('Enter a task title');return}
-  todos.unshift({id:uid(),title,category:selectedCat,tag:selectedTag||null,priority:document.getElementById('tf-priority').value,recurring:document.getElementById('tf-recurring').value||null,due:document.getElementById('tf-due').value||null,done:false,created:todayStr});
-  persist();updateMeta();renderTodos();renderToday();renderTagFilterRow();
-  document.getElementById('tf-title').value='';
-  document.getElementById('tf-due').value='';
-  selectedTag=null;toggleTaskForm();showToast('Task added ✓');
-}
-function quickAddTask(){
-  const inp=document.getElementById('quick-task-input');
-  const val=inp.value.trim();if(!val)return;
-  todos.unshift({id:uid(),title:val,category:currentMode==='all'?'work':currentMode,tag:null,priority:'medium',recurring:null,due:null,done:false,created:todayStr});
-  inp.value='';persist();updateMeta();renderTodos();renderToday();showToast('Task added ✓');
-}
-function setFilter(f,btn){
-  currentFilter=f;currentTagFilter=null;
-  document.querySelectorAll('.filter-row:first-of-type .filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('#tag-filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
-  renderTodos();
-}
-function setTagFilter(tag,btn){
-  if(currentTagFilter===tag){currentTagFilter=null;btn.classList.remove('active')}
-  else{
-    currentTagFilter=tag;
-    document.querySelectorAll('#tag-filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-  renderTodos();
-}
-function renderTagFilterRow(){
-  const row=document.getElementById('tag-filter-row');if(!row)return;
-  let relevantTags=[];
-  if(currentMode==='all'){
-    const used=new Set(todos.map(t=>t.tag).filter(Boolean));
-    relevantTags=[...used];
-  } else {
-    relevantTags=(tags[currentMode]||[]);
-  }
-  if(!relevantTags.length){row.innerHTML='';return}
-  row.innerHTML=relevantTags.map(tag=>`<button class="filter-btn ${currentTagFilter===tag?'active':''}" onclick="setTagFilter('${tag}',this)">🏷 ${esc(tag)}</button>`).join('');
-}
-function isOverdue(t){return t.due&&t.due<todayStr&&!t.done}
-
-function renderTodoHTML(t){
-  const dotCol={high:'#E05C5C',medium:'#F5A623',low:'#4CAF87'};
-  const overdue=isOverdue(t);
-  const noteCount=notes.filter(n=>n.taskId===t.id).length;
-  return `<div class="todo-item ${t.done?'done':''}" id="todo-${t.id}">
-    <button class="check-btn ${t.done?'checked':''}" onclick="toggleTodo('${t.id}')">
-      ${t.done?'<svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>':''}
-    </button>
-    <div class="todo-body">
-      <div class="todo-title-row ${t.done?'strikethrough':''}">
-        <span class="priority-dot" style="background:${dotCol[t.priority]||dotCol.medium}"></span>
-        ${esc(t.title)}
-      </div>
-      <div class="todo-meta">
-        <span class="cat-badge ${t.category}">${catEmoji(t.category)} ${cap(t.category)}</span>
-        ${t.tag?`<span class="tag-badge">${esc(t.tag)}</span>`:''}
-        ${t.due?`<span class="todo-due ${overdue?'overdue':''}">${overdue?'⚠ Overdue: ':'Due '}${t.due}</span>`:''}
-        ${t.recurring?`<span class="recurring-badge">🔁 ${t.recurring}</span>`:''}
-        <button class="note-meta-btn" onclick="openNotesForTask('${t.id}',event)">${noteCount>0?`📝 ${noteCount}`:'📝'}</button>
-      </div>
-    </div>
-    <button class="del-btn" onclick="deleteTodo('${t.id}')">×</button>
-  </div>`;
-}
-function renderTodos(){
-  const list=document.getElementById('todo-list');
-  let f=modeFilter(todos);
-  if(currentFilter==='active') f=f.filter(t=>!t.done);
-  else if(currentFilter==='done') f=f.filter(t=>t.done);
-  else if(currentFilter==='high') f=f.filter(t=>!t.done&&t.priority==='high');
-  else if(currentFilter==='overdue') f=f.filter(t=>isOverdue(t));
-  if(currentTagFilter) f=f.filter(t=>t.tag===currentTagFilter);
-  list.innerHTML=f.length?f.map(t=>renderTodoHTML(t)).join(''):`<div class="empty-state">${currentFilter==='done'?'No completed tasks yet.':'No tasks. Add one above!'}</div>`;
-}
-function toggleTodo(id){todos=todos.map(t=>t.id===id?{...t,done:!t.done}:t);persist();updateMeta();renderTodos();renderToday()}
-function deleteTodo(id){todos=todos.filter(t=>t.id!==id);persist();updateMeta();renderTodos();renderToday()}
-
-function processDailyRecurring(){
-  const lastRun=localStorage.getItem('pa-last-recurring');
-  if(lastRun===todayStr)return;
-  const toAdd=[];
-  todos.forEach(t=>{
-    if(!t.recurring)return;
-    if(t.recurring==='daily'&&!todos.find(x=>x.title===t.title&&x.due===todayStr&&x.id!==t.id))
-      toAdd.push({...t,id:uid(),done:false,due:todayStr,created:todayStr});
-    if(t.recurring==='weekly'){
-      const diff=Math.floor((new Date()-new Date(t.created))/864e5);
-      if(diff>=7&&!todos.find(x=>x.title===t.title&&x.due===todayStr&&x.id!==t.id))
-        toAdd.push({...t,id:uid(),done:false,due:todayStr,created:todayStr});
-    }
-  });
-  if(toAdd.length){todos=[...toAdd,...todos];persist()}
-  localStorage.setItem('pa-last-recurring',todayStr);
-}
-
-// ── Today ─────────────────────────────────────────────────────────────────────
-function renderToday(){
-  const due=modeFilter(todos).filter(t=>!t.done&&t.due&&t.due<=todayStr);
-  document.getElementById('today-tasks').innerHTML=due.length?due.map(t=>renderTodoHTML(t)).join(''):'<div class="empty-state" style="margin-top:8px">No tasks due today 🎉</div>';
-  const evs=allEventsForDate(todayStr);
-  document.getElementById('today-events').innerHTML=evs.length
-    ?evs.map(ev=>`<div class="today-event"><div class="event-bar" style="background:${ev.source==='gcal'?'var(--blue)':'var(--purple)'}"></div><div class="event-body"><div class="event-title">${esc(ev.title)}</div>${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}</div></div>`).join('')
-    :'<div class="empty-state" style="margin-top:8px">No events today</div>';
-}
-
-// ── Briefing ──────────────────────────────────────────────────────────────────
-async function generateBriefing(){
-  const btn=document.getElementById('briefing-btn'),content=document.getElementById('briefing-content');
-  if(!apiKey){content.innerHTML='<div class="briefing-empty">Add an API key to use AI briefings</div>';return}
-  btn.disabled=true;btn.textContent='Loading…';
-  content.innerHTML='<div class="briefing-empty">Thinking…</div>';
-  const due=todos.filter(t=>!t.done&&t.due&&t.due<=todayStr);
-  const evs=allEventsForDate(todayStr);
-  const high=todos.filter(t=>!t.done&&t.priority==='high').slice(0,5);
-  const ctx=`Today: ${todayStr}\nDue/overdue: ${due.map(t=>`${t.title} (${t.priority}, ${t.category}${t.tag?'/'+t.tag:''})`).join(', ')||'None'}\nToday's events: ${evs.map(e=>`${e.title}${e.time?' at '+fmtTime(e.time):''}`).join(', ')||'None'}\nHigh priority: ${high.map(t=>`${t.title} [${t.category}]`).join(', ')||'None'}`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a sharp personal assistant. Give a concise morning briefing in 3-4 short prose paragraphs. No bullet points. End with one clear focus recommendation.',messages:[{role:'user',content:`My day:\n${ctx}\n\nGive me a morning briefing.`}]})});
-    const data=await res.json();
-    content.innerHTML=`<div class="briefing-content">${esc(data.content?.find(b=>b.type==='text')?.text||'Could not generate.')}</div>`;
-  }catch(e){content.innerHTML='<div class="briefing-empty">Error — check your API key</div>'}
-  btn.disabled=false;btn.textContent='Refresh';
-}
-
-// ── Calendar ──────────────────────────────────────────────────────────────────
-function allEventsForDate(date){
-  return[...events.filter(e=>e.date===date),...gcalEvs.filter(e=>e.date===date)];
-}
-function fmtTime(t){if(!t)return'';const[h,m]=t.split(':').map(Number);return`${(h%12)||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`}
-function calNav(dir){const d=new Date(calState.year,calState.month+dir);calState={year:d.getFullYear(),month:d.getMonth()};selectedDay=null;renderCalendar()}
-function selectDay(ds){selectedDay=selectedDay===ds?null:ds;renderCalendar()}
-function renderCalendar(){
-  document.getElementById('cal-title').textContent=`${MONTHS[calState.month]} ${calState.year}`;
-  const first=new Date(calState.year,calState.month,1).getDay(),last=new Date(calState.year,calState.month+1,0).getDate();
-  let html='';
-  for(let i=0;i<first;i++) html+='<div class="cal-cell empty"></div>';
-  for(let d=1;d<=last;d++){
-    const ds=`${calState.year}-${String(calState.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const evs=allEventsForDate(ds);
-    const hasLocal=events.some(e=>e.date===ds);
-    const hasGcal=gcalEvs.some(e=>e.date===ds);
-    html+=`<div class="cal-cell ${ds===todayStr?'today':''} ${selectedDay===ds?'selected':''}" onclick="selectDay('${ds}')"><div class="cal-day-num">${d}</div>${evs.length?`<div class="cal-dots">${hasLocal?'<div class="cal-dot" style="background:var(--purple)"></div>':''}${hasGcal?'<div class="cal-dot" style="background:var(--blue)"></div>':''}</div>`:''}</div>`;
-  }
-  document.getElementById('cal-grid').innerHTML=html;
-  renderDayDetail();
-}
-function renderDayDetail(){
-  const el=document.getElementById('day-detail');if(!selectedDay){el.innerHTML='';return}
-  const evs=allEventsForDate(selectedDay);
-  const[y,m,d]=selectedDay.split('-');
-  el.innerHTML=`<div class="day-detail"><div class="day-detail-title">${MONTHS[parseInt(m)-1]} ${parseInt(d)}, ${y}</div>${!evs.length?'<div style="color:var(--muted);font-size:14px;margin-bottom:10px">No events. Add below.</div>':''}${evs.map(ev=>`<div class="event-item"><div class="event-bar" style="background:${ev.source==='gcal'?'var(--blue)':'var(--purple)'}"></div><div class="event-body"><div class="event-title">${esc(ev.title)}</div>${ev.time?`<div class="event-time">${fmtTime(ev.time)}</div>`:''}${ev.note?`<div class="event-note">${esc(ev.note.slice(0,80))}${ev.note.length>80?'…':''}</div>`:''}</div>${ev.source!=='gcal'?`<button class="del-btn" onclick="deleteEvent('${ev.id}')">×</button>`:'<div style="width:22px"></div>'}</div>`).join('')}<div class="event-add-form"><input type="text" id="ev-title" placeholder="Event title" autocomplete="off"><input type="time" id="ev-time" style="color-scheme:dark"><input type="text" id="ev-note" placeholder="Note (optional)" autocomplete="off"><button onclick="addEventManual()">Add Event</button></div></div>`;
-}
-function addEventManual(){
-  const title=document.getElementById('ev-title')?.value.trim();
-  if(!title){showToast('Enter event title');return}
-  events.push({id:uid(),title,date:selectedDay,time:document.getElementById('ev-time')?.value||null,note:document.getElementById('ev-note')?.value.trim()||null});
-  persist();updateMeta();renderCalendar();renderToday();showToast('Event added ✓');
-}
-function deleteEvent(id){events=events.filter(e=>e.id!==id);persist();updateMeta();renderCalendar();renderToday()}
-
-// ── Google Calendar Sync ──────────────────────────────────────────────────────
-let gcalSetupOpen=false;
-function toggleGcalSetup(){
-  gcalSetupOpen=!gcalSetupOpen;
-  const el=document.getElementById('gcal-setup');
-  el.style.display=gcalSetupOpen?'block':'none';
-  if(gcalSetupOpen){
-    const inp=document.getElementById('gcal-ics-input');
-    inp.value=localStorage.getItem('pa-gcal-ics')||'';
-    setTimeout(()=>inp.focus(),100);
-  }
-}
-function saveGcalUrl(){
-  const url=document.getElementById('gcal-ics-input').value.trim();
-  if(!url){showToast('Paste your ICS URL first');return}
-  localStorage.setItem('pa-gcal-ics',url);
-  gcalSetupOpen=false;
-  document.getElementById('gcal-setup').style.display='none';
-  syncGCal();
-}
-async function syncGCal(){
-  const icsUrl=localStorage.getItem('pa-gcal-ics');
-  if(!icsUrl){toggleGcalSetup();return}
-  const btn=document.getElementById('gcal-sync-btn');
-  if(btn){btn.textContent='⟳…';btn.disabled=true}
-  try{
-    const res=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(icsUrl)}`);
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const icsText=await res.text();
-    gcalEvs=parseICS(icsText);
-    localStorage.setItem('pa-gcal-events',JSON.stringify(gcalEvs));
-    localStorage.setItem('pa-gcal-sync-time',new Date().toISOString());
-    updateGcalStatus();renderCalendar();renderToday();
-    showToast(`Synced ${gcalEvs.length} events ✓`);
-  }catch(e){
-    showToast('Sync failed — check your ICS URL');
-  }
-  if(btn){btn.textContent='⟳ Sync';btn.disabled=false}
-}
-function updateGcalStatus(){
-  const dot=document.getElementById('gcal-dot');
-  const time=document.getElementById('gcal-sync-time');
-  const syncTime=localStorage.getItem('pa-gcal-sync-time');
-  if(dot) dot.style.background=gcalEvs.length>0?'var(--success)':'var(--muted)';
-  if(time){
-    if(syncTime){
-      const d=new Date(syncTime);
-      time.textContent=`Last sync: ${d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} ${d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
-    } else if(localStorage.getItem('pa-gcal-ics')){
-      time.textContent='URL saved — tap Sync';
-    }
-  }
-}
-function parseICS(text){
-  // Unfold lines (continuation lines start with space or tab)
-  const unfolded=text.replace(/\r?\n[ \t]/g,'');
-  const lines=unfolded.split(/\r?\n/);
-  const evts=[];let cur=null;
-  for(const line of lines){
-    if(line==='BEGIN:VEVENT'){cur={};continue}
-    if(line==='END:VEVENT'&&cur){const ev=buildGcalEvent(cur);if(ev)evts.push(ev);cur=null;continue}
-    if(cur){
-      const sep=line.indexOf(':');
-      if(sep>0){
-        // Strip property params (e.g. DTSTART;TZID=Asia/Kolkata → DTSTART)
-        const key=line.slice(0,sep).split(';')[0];
-        // Keep TZID for date parsing
-        const hasTzid=line.slice(0,sep).includes('TZID');
-        cur[key]=line.slice(sep+1);
-        if(hasTzid) cur[key+'_TZLOCAL']=true;
-      }
-    }
-  }
-  return evts;
-}
-function buildGcalEvent(cur){
-  if(cur.STATUS==='CANCELLED') return null;
-  const title=cur.SUMMARY;
-  const dtstart=cur.DTSTART;
-  if(!title||!dtstart) return null;
-  const raw=dtstart.replace(/[-:]/g,'');
-  let date,time;
-  if(raw.length===8){
-    // All-day
-    date=`${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`;
-    time=null;
-  } else {
-    const ymd=raw.slice(0,8);
-    date=`${ymd.slice(0,4)}-${ymd.slice(4,6)}-${ymd.slice(6,8)}`;
-    if(dtstart.endsWith('Z')){
-      // UTC → local
-      const utc=new Date(`${date}T${raw.slice(9,11)}:${raw.slice(11,13)}:00Z`);
-      date=utc.toISOString().slice(0,10);
-      time=`${String(utc.getHours()).padStart(2,'0')}:${String(utc.getMinutes()).padStart(2,'0')}`;
-    } else {
-      // Treat as local (TZID present)
-      time=`${raw.slice(9,11)}:${raw.slice(11,13)}`;
-    }
-  }
-  const decode=s=>(s||'').replace(/\\n/g,'\n').replace(/\\,/g,',').replace(/\\\\/g,'\\').replace(/\\;/g,';');
-  return{
-    id:cur.UID||uid(),
-    title:decode(title),
-    date,time,
-    note:cur.DESCRIPTION?decode(cur.DESCRIPTION).slice(0,200):null,
-    source:'gcal'
-  };
-}
-
-// ── Notes ─────────────────────────────────────────────────────────────────────
-function toggleNoteForm(){
-  showNoteForm=!showNoteForm;
-  document.getElementById('note-form-wrap').style.display=showNoteForm?'block':'none';
-  if(showNoteForm){
-    noteSelectedTags=[];noteLinkedTaskId=null;
-    refreshNoteTaskDropdown();refreshNoteTagPills();
-    document.getElementById('note-title-inp').focus();
-  }
-}
-function addNote(){
-  const body=document.getElementById('note-body').value.trim();
-  if(!body){showToast('Write something first');return}
-  const title=document.getElementById('note-title-inp').value.trim();
-  notes.unshift({id:uid(),title,body,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],created:todayStr,updated:todayStr});
-  persist();
-  document.getElementById('note-body').value='';
-  document.getElementById('note-title-inp').value='';
-  document.getElementById('note-task-link-sel').value='';
-  noteSelectedTags=[];noteLinkedTaskId=null;
-  showNoteForm=false;
-  document.getElementById('note-form-wrap').style.display='none';
-  renderNotes();renderTodos();renderToday();showToast('Note added ✓');
-}
-function deleteNote(id){
-  notes=notes.filter(n=>n.id!==id);
-  persist();renderNotes();renderTodos();
-}
-function toggleNoteExpand(id){
-  if(expandedNotes.has(id))expandedNotes.delete(id);
-  else expandedNotes.add(id);
-  renderNotes();
-}
-function renderNotes(){
-  const list=document.getElementById('notes-list');if(!list)return;
-  let filtered=[...notes];
-  if(noteTaskFilter){
-    filtered=filtered.filter(n=>n.taskId===noteTaskFilter);
-  } else if(noteFilter!=='all'){
-    filtered=filtered.filter(n=>(n.tags||[]).includes(noteFilter));
-  }
-  if(!filtered.length){
-    list.innerHTML='<div class="empty-state">No notes yet. Tap + to add one.</div>';return;
-  }
-  list.innerHTML=filtered.map(n=>{
-    const linkedTask=n.taskId?todos.find(t=>t.id===n.taskId):null;
-    const expanded=expandedNotes.has(n.id);
-    const bodyClass=expanded||n.body.length<=180?'note-body':'note-body collapsed';
-    return`<div class="note-card" id="note-${n.id}">
-      <div class="note-card-header">
-        ${n.title?`<div class="note-title">${esc(n.title)}</div>`:''}
-        <button class="del-btn" onclick="deleteNote('${n.id}')">×</button>
-      </div>
-      <div class="${bodyClass}" onclick="toggleNoteExpand('${n.id}')">${esc(n.body)}</div>
-      <div class="note-meta">
-        ${linkedTask?`<span class="note-task-link" onclick="focusTask('${linkedTask.id}',event)">📋 ${esc(linkedTask.title.slice(0,28))}${linkedTask.title.length>28?'…':''}</span>`:''}
-        ${(n.tags||[]).map(t=>`<span class="tag-badge">${esc(t)}</span>`).join('')}
-        <span class="note-date">${n.created}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-function refreshNoteTagPills(){
-  const el=document.getElementById('note-tag-pills');if(!el)return;
-  const all=allTagsList();
-  el.innerHTML=all.length?all.map(t=>`<button class="tag-pick-pill ${noteSelectedTags.includes(t)?'sel':''}" onclick="toggleNoteTag('${t}')">${esc(t)}</button>`).join(''):'<span style="font-size:12px;color:var(--muted)">Add tags via Manage Tags below</span>';
-}
-function toggleNoteTag(tag){
-  const idx=noteSelectedTags.indexOf(tag);
-  if(idx>=0)noteSelectedTags.splice(idx,1);
-  else noteSelectedTags.push(tag);
-  refreshNoteTagPills();
-}
-function refreshNoteTaskDropdown(){
-  const sel=document.getElementById('note-task-link-sel');if(!sel)return;
-  const active=todos.filter(t=>!t.done).slice(0,50);
-  sel.innerHTML='<option value="">No task linked</option>'+active.map(t=>`<option value="${t.id}">${esc(t.title.slice(0,45))}${t.title.length>45?'…':''}</option>`).join('');
-  if(noteLinkedTaskId) sel.value=noteLinkedTaskId;
-}
-function renderNoteFilterRow(){
-  const row=document.getElementById('note-filter-row');if(!row)return;
-  const all=allTagsList();
-  row.innerHTML=all.length?all.map(t=>`<button class="filter-btn ${noteFilter===t&&!noteTaskFilter?'active':''}" onclick="setNoteFilter('${t}',this)">${esc(t)}</button>`).join(''):'';
-}
-function setNoteFilter(f,btn){
-  noteFilter=f===noteFilter?'all':f;
-  noteTaskFilter=null;
-  document.querySelectorAll('#note-filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
-  if(noteFilter!=='all')btn.classList.add('active');
-  renderNoteTaskChip();renderNotes();
-}
-function renderNoteTaskChip(){
-  const el=document.getElementById('note-task-chip');if(!el)return;
-  if(!noteTaskFilter){el.innerHTML='';return}
-  const task=todos.find(t=>t.id===noteTaskFilter);
-  el.innerHTML=task?`<div class="note-task-chip-pill">📋 ${esc(task.title.slice(0,24))}${task.title.length>24?'…':''} <button onclick="clearNoteTaskFilter()">×</button></div>`:'';
-}
-function clearNoteTaskFilter(){noteTaskFilter=null;renderNoteTaskChip();renderNotes()}
-function openNotesForTask(taskId,e){
-  if(e)e.stopPropagation();
-  noteTaskFilter=taskId;noteFilter='all';
-  switchTab('notes');
-}
-function focusTask(taskId,e){
-  if(e)e.stopPropagation();
-  noteTaskFilter=null;switchTab('tasks');
-  setTimeout(()=>{const el=document.getElementById('todo-'+taskId);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},150);
-}
-
-// ── Chat ──────────────────────────────────────────────────────────────────────
-function renderChat(){
-  const el=document.getElementById('chat-messages');
-  el.innerHTML=chatHistory.map(m=>`<div class="msg ${m.role}"><div class="bubble">${esc(m.content)}</div></div>`).join('');
-  setTimeout(()=>el.scrollTop=el.scrollHeight,50);
-}
-
-async function sendChat(){
-  const inp=document.getElementById('chat-input');
-  const text=inp.value.trim();if(!text||isSending)return;
-  inp.value='';inp.style.height='auto';
-  document.getElementById('send-btn').disabled=true;
-  if(!apiKey){
-    chatHistory.push({role:'user',content:text},{role:'assistant',content:'AI chat needs an API key. Reload the page to add one.'});
-    renderChat();return;
-  }
-  isSending=true;
-  chatHistory.push({role:'user',content:text},{role:'assistant',content:'…'});
-  renderChat();
-  try{
-    const allCatTags=Object.entries(tags).map(([c,ts])=>`${c}: ${ts.join(', ')||'none'}`).join(' | ');
-    const msgs=chatHistory.slice(0,-1).filter(m=>!(m.role==='assistant'&&m.content==='…')).map(m=>({role:m.role,content:m.content}));
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',max_tokens:800,
-        system:`You are a friendly personal assistant. You help manage tasks and events.
-
-When the user wants to add a task or event, respond with ONLY this JSON (no other text):
-{"action":"add_todo","todo":{"title":"...","priority":"high|medium|low","category":"work|personal|investing","tag":null,"due":"YYYY-MM-DD or null","recurring":"daily|weekly or null"},"reply":"Your friendly confirmation message"}
-
-For events:
-{"action":"add_event","event":{"title":"...","date":"YYYY-MM-DD","time":"HH:MM or null","note":"... or null"},"reply":"Your friendly confirmation message"}
-
-For all other messages (questions, advice, chat), respond with ONLY:
-{"action":"chat","reply":"Your helpful response here"}
-
-Available tags: ${allCatTags}
-Today: ${todayStr}
-IMPORTANT: Always return valid JSON only. Never return plain text. The reply field should be natural and conversational.`,
-        messages:msgs
-      })
-    });
-    const data=await res.json();
-    const raw=data.content?.find(b=>b.type==='text')?.text||'{}';
-    const cleaned=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
-    let result;
-    try{result=JSON.parse(cleaned)}
-    catch{result={action:'chat',reply:raw}}
-    chatHistory.pop();
-    if(result.action==='add_todo'&&result.todo){
-      const t=result.todo;
-      if(t.tag&&t.category){if(!tags[t.category])tags[t.category]=[];if(!tags[t.category].includes(t.tag))tags[t.category].push(t.tag)}
-      todos.unshift({id:uid(),...t,done:false,created:todayStr});
-      persist();updateMeta();renderToday();renderTodos();renderTagFilterRow();renderNoteFilterRow();showToast('Task added ✓');
-    }
-    if(result.action==='add_event'&&result.event){
-      events.push({id:uid(),...result.event});
-      persist();updateMeta();renderToday();renderCalendar();showToast('Event added ✓');
-    }
-    chatHistory.push({role:'assistant',content:result.reply||'Done!'});
-  }catch(e){
-    chatHistory.pop();
-    chatHistory.push({role:'assistant',content:'Something went wrong. Please try again.'});
-  }
-  isSending=false;renderChat();
-}
-</script>
 </body>
 </html>
