@@ -142,6 +142,46 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .note-meta-btn{background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;padding:2px 5px;border-radius:8px;-webkit-tap-highlight-color:transparent;transition:all .15s}
 .note-meta-btn:active{background:var(--accent-dim);color:var(--accent)}
 .del-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.edit-btn{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 5px;line-height:1;flex-shrink:0;border-radius:6px;-webkit-tap-highlight-color:transparent;transition:color .15s}
+.edit-btn:active{color:var(--accent)}
+.note-search{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
+.note-search:focus{border-color:var(--accent)}
+.note-inline-tag{display:inline-flex;align-items:center;gap:3px;background:var(--accent-dim);color:var(--accent);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600}
+.note-inline-tag button{background:none;border:none;color:var(--accent);cursor:pointer;padding:0;font-size:15px;line-height:1;-webkit-tap-highlight-color:transparent}
+/* Habits */
+.habit-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.habit-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:transparent;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#111}
+.habit-check.done{background:var(--success);border-color:var(--success)}
+.habit-emoji{font-size:22px;flex-shrink:0;line-height:1}
+.habit-info{flex:1;min-width:0}
+.habit-name{font-size:14px;font-weight:600}
+.habit-streak{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* People */
+.person-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:8px}
+.person-header{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.person-avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.person-info{flex:1;min-width:0}
+.person-name{font-size:15px;font-weight:700}
+.person-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.person-expand{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.person-expand.open{display:block}
+.person-log-item{font-size:13px;padding:7px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start}
+.person-log-date{font-size:11px;color:var(--muted);flex-shrink:0;padding-top:1px;min-width:52px}
+.person-log-text{flex:1;line-height:1.5}
+.person-add-note{display:flex;gap:6px;margin-top:8px}
+.person-add-note input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;font-family:inherit}
+.person-add-note input:focus{border-color:var(--accent)}
+.person-add-note button{background:var(--accent);color:#111;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rel-badge{font-size:10px;font-weight:700;border-radius:20px;padding:2px 8px}
+
+/* Backup modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:450;display:flex;align-items:flex-end;justify-content:center;padding:0 0 env(safe-area-inset-bottom,0)}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:28px 24px 32px;width:100%;max-width:480px;border:1px solid var(--border);border-bottom:none}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.modal-sub{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.55}
+.modal-btns{display:flex;flex-direction:column;gap:8px}
+
 .empty-state{text-align:center;color:var(--muted);margin-top:50px;font-size:14px;line-height:2}
 
 /* Tags section (inside Notes panel) */
@@ -277,7 +317,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <div class="logo"><span>◆</span> Personal Agent</div>
       <div class="date-chip" id="top-date"></div>
     </div>
-    <div class="topbar-row2">
+    <div class="topbar-row2" id="topbar-row2" style="display:none">
       <div class="mode-toggle">
         <button class="mode-btn active" onclick="setMode('all',this)">All</button>
         <button class="mode-btn" onclick="setMode('work',this)">Work</button>
@@ -298,6 +338,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         </div>
         <div id="briefing-content"><div class="briefing-empty">Tap Generate for your AI daily briefing</div></div>
       </div>
+      <!-- Habits -->
+      <div class="section-hdr" style="display:flex;align-items:center;justify-content:space-between;margin-top:14px">
+        <span>Daily Habits</span>
+        <button onclick="toggleHabitForm()" style="background:none;border:none;color:var(--accent);font-size:22px;font-weight:300;cursor:pointer;line-height:1;padding:0 2px;-webkit-tap-highlight-color:transparent">+</button>
+      </div>
+      <div id="habit-add-form" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="habit-emoji-inp" placeholder="🏃" maxlength="2" style="width:52px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:20px;text-align:center;outline:none;font-family:inherit">
+          <input type="text" id="habit-name-inp" placeholder="Habit name…" autocomplete="off" onkeydown="if(event.key==='Enter')addHabit()" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;outline:none;font-family:inherit">
+        </div>
+        <div class="form-btns">
+          <button class="form-btn secondary" onclick="toggleHabitForm()">Cancel</button>
+          <button class="form-btn primary" onclick="addHabit()">Add Habit</button>
+        </div>
+      </div>
+      <div id="habits-list"></div>
+
       <div class="section-hdr">Due Today & Overdue</div>
       <div id="today-tasks"></div>
       <div class="section-hdr">Today's Events</div>
@@ -414,27 +471,36 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 
     <!-- NOTES (replaces Tags, includes tag manager at bottom) -->
     <div class="panel" id="panel-notes">
+      <!-- Search -->
+      <input class="note-search" id="note-search" placeholder="🔍  Search notes…" oninput="renderNotes()" autocomplete="off">
+
       <!-- Quick add -->
       <div class="quick-add">
-        <input type="text" id="note-title-inp" placeholder="Note title (optional)…" autocomplete="off">
-        <button onclick="toggleNoteForm()">+</button>
+        <input type="text" id="note-title-inp" placeholder="Note title (optional)…" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();openNoteForm()}">
+        <button onclick="openNoteForm()">+</button>
       </div>
 
       <!-- Note form -->
       <div id="note-form-wrap" style="display:none">
         <div class="task-form">
           <textarea id="note-body" rows="4" placeholder="Write your note…"></textarea>
-          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Link to Task</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;margin-top:4px">Link to Task</div>
           <select id="note-task-link-sel" onchange="noteLinkedTaskId=this.value||null">
             <option value="">No task linked</option>
           </select>
-          <div class="tag-selector-wrap" style="margin-top:4px">
-            <div class="tag-selector-label">Tags</div>
-            <div class="tag-pills" id="note-tag-pills"></div>
+          <div style="margin-top:10px">
+            <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Tags</div>
+            <div id="note-inline-tag-chips" style="display:flex;flex-wrap:wrap;gap:5px;min-height:4px;margin-bottom:7px"></div>
+            <div style="display:flex;gap:6px">
+              <input type="text" id="note-tag-input" placeholder="Type a tag and press Enter…" autocomplete="off"
+                style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;font-family:inherit"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();addNoteTagInline()}"
+                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
           </div>
-          <div class="form-btns" style="margin-top:10px">
+          <div class="form-btns" style="margin-top:12px">
             <button class="form-btn secondary" onclick="toggleNoteForm()">Cancel</button>
-            <button class="form-btn primary" onclick="addNote()">Add Note</button>
+            <button class="form-btn primary" id="note-save-btn" onclick="addNote()">Add Note</button>
           </div>
         </div>
       </div>
@@ -458,6 +524,41 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           <div id="tags-manager"></div>
         </div>
       </div>
+    </div>
+
+    <!-- PEOPLE -->
+    <div class="panel" id="panel-people">
+      <input class="note-search" id="people-search" placeholder="🔍  Search people…" oninput="renderPeople()" autocomplete="off">
+      <div class="filter-row" id="people-filter-row">
+        <button class="filter-btn active" onclick="setPeopleFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setPeopleFilter('work',this)">Work</button>
+        <button class="filter-btn" onclick="setPeopleFilter('friend',this)">Friend</button>
+        <button class="filter-btn" onclick="setPeopleFilter('family',this)">Family</button>
+        <button class="filter-btn" onclick="setPeopleFilter('investor',this)">Investor</button>
+      </div>
+      <!-- Add person form -->
+      <div id="person-form-wrap" style="display:none">
+        <div class="task-form">
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <input type="text" id="pf-emoji" placeholder="😊" maxlength="2" style="width:52px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:20px;text-align:center;outline:none;font-family:inherit">
+            <input type="text" id="pf-name" placeholder="Name" autocomplete="off" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;outline:none;font-family:inherit">
+          </div>
+          <input type="text" id="pf-company" placeholder="Company / org (optional)" autocomplete="off" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;outline:none;font-family:inherit;margin-bottom:8px;box-sizing:border-box">
+          <select id="pf-rel" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:14px;outline:none">
+            <option value="work">Work</option>
+            <option value="friend">Friend</option>
+            <option value="family">Family</option>
+            <option value="investor">Investor</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="form-btns" style="margin-top:10px">
+            <button class="form-btn secondary" onclick="togglePersonForm()">Cancel</button>
+            <button class="form-btn primary" onclick="addPerson()">Add Person</button>
+          </div>
+        </div>
+      </div>
+      <button onclick="togglePersonForm()" style="width:100%;background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:13px;color:var(--muted);font-size:14px;cursor:pointer;margin-bottom:12px;-webkit-tap-highlight-color:transparent;font-family:inherit">+ Add Person</button>
+      <div id="people-list"></div>
     </div>
 
     <!-- CHAT -->
@@ -486,6 +587,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Calendar
     </button>
+    <button class="tab-btn" id="tab-people" onclick="switchTab('people')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      People
+    </button>
     <button class="tab-btn" id="tab-notes" onclick="switchTab('notes')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
       Notes
@@ -494,6 +599,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Chat
     </button>
+  </div>
+</div>
+
+<!-- Backup modal -->
+<div id="backup-modal" style="display:none" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-title">📦 Weekly Backup</div>
+    <div class="modal-sub">It's been a week since your last backup. Your data lives only in this browser — share it so you don't lose it.</div>
+    <div class="modal-btns">
+      <button class="primary-btn" onclick="shareBackup()">Share / Email Backup File</button>
+      <button onclick="dismissBackup()" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:10px;width:100%;font-family:inherit">Remind me in 3 days</button>
+    </div>
   </div>
 </div>
 
@@ -546,12 +663,15 @@ let events  = JSON.parse(localStorage.getItem('pa-events')||'[]');
 let tags    = JSON.parse(localStorage.getItem('pa-tags')||'{"work":[],"personal":[],"investing":[]}');
 let notes   = JSON.parse(localStorage.getItem('pa-notes')||'[]');
 let gcalEvs = JSON.parse(localStorage.getItem('pa-gcal-events')||'[]');
+let habits  = JSON.parse(localStorage.getItem('pa-habits')||'[]');
+let habitLog= JSON.parse(localStorage.getItem('pa-habit-log')||'{}');
+let people  = JSON.parse(localStorage.getItem('pa-people')||'[]');
 let apiKey  = localStorage.getItem('pa-apikey')||'';
 let chatHistory=[{role:'assistant',content:'Hi! I\'m your personal agent.\n\nTry:\n• "Add high priority work task: due diligence review by Friday"\n• "Add investing task: review portfolio returns"\n• "Schedule call June 25 at 4pm"\n• "What should I focus on today?"'}];
 let currentFilter='all',currentTagFilter=null,currentMode='all',currentTab='today';
 let calState={year:today.getFullYear(),month:today.getMonth()},selectedDay=todayStr;
 let isSending=false,showTaskForm=false,selectedCat='work',selectedTag=null;
-let showNoteForm=false,noteLinkedTaskId=null,noteSelectedTags=[],noteFilter='all',noteTaskFilter=null,expandedNotes=new Set(),tagMgrOpen=false;
+let showNoteForm=false,noteLinkedTaskId=null,noteSelectedTags=[],noteFilter='all',noteTaskFilter=null,expandedNotes=new Set(),tagMgrOpen=false,editingNoteId=null;
 
 function uid(){return Math.random().toString(36).slice(2,9)}
 function persist(){
@@ -559,6 +679,10 @@ function persist(){
   localStorage.setItem('pa-events',JSON.stringify(events));
   localStorage.setItem('pa-tags',JSON.stringify(tags));
   localStorage.setItem('pa-notes',JSON.stringify(notes));
+  localStorage.setItem('pa-habits',JSON.stringify(habits));
+  localStorage.setItem('pa-habit-log',JSON.stringify(habitLog));
+  localStorage.setItem('pa-people',JSON.stringify(people));
+  autoBackup();
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
 
@@ -567,7 +691,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   processDailyRecurring();
   updateMeta();renderToday();renderTodos();renderCalendar();renderChat();
   renderNotes();renderNoteFilterRow();updateGcalStatus();
-  checkGcalRedirect(); // handle OAuth redirect response if returning from Google
+  renderHabits();renderPeople();
+  checkGcalRedirect();
+  checkAutoBrief();
+  checkBackupReminder();
   const inp=document.getElementById('chat-input');
   inp.addEventListener('input',()=>{
     document.getElementById('send-btn').disabled=!inp.value.trim()||isSending;
@@ -606,21 +733,22 @@ function showToast(msg){
 
 function switchTab(tab){
   currentTab=tab;
-  ['today','tasks','calendar','notes','chat'].forEach(t=>{
+  ['today','tasks','calendar','people','notes','chat'].forEach(t=>{
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
   });
+  document.getElementById('topbar-row2').style.display=tab==='tasks'?'flex':'none';
   document.getElementById('chat-input-wrap').style.display=tab==='chat'?'flex':'none';
   if(tab==='calendar'){
     renderCalendar();updateGcalStatus();
-    // Auto-sync if URL set and last sync >1hr ago
     const lastSync=localStorage.getItem('pa-gcal-sync-time');
     const stale=!lastSync||(Date.now()-new Date(lastSync).getTime())>3600000;
     if(localStorage.getItem('pa-gcal-client-id')&&stale&&gcalToken) fetchAllGcalEvents();
   }
   if(tab==='tasks'){renderTodos();refreshTagPills();renderTagFilterRow()}
-  if(tab==='today') renderToday();
-  if(tab==='notes'){renderNotes();renderNoteFilterRow();renderNoteTaskChip();refreshNoteTagPills();refreshNoteTaskDropdown()}
+  if(tab==='today'){renderToday();checkAutoBrief()}
+  if(tab==='notes'){renderNotes();renderNoteFilterRow();renderNoteTaskChip();refreshNoteTaskDropdown()}
+  if(tab==='people') renderPeople();
 }
 
 // ── Tags ──────────────────────────────────────────────────────────────────────
@@ -661,7 +789,7 @@ function addTag(cat){
   if(!tags[cat])tags[cat]=[];
   if(tags[cat].includes(val)){showToast('Tag already exists');return}
   tags[cat].push(val);persist();inp.value='';
-  renderTagsManager();renderTagFilterRow();renderNoteFilterRow();refreshNoteTagPills();showToast(`Tag "${val}" added`);
+  renderTagsManager();renderTagFilterRow();renderNoteFilterRow();showToast(`Tag "${val}" added`);
 }
 function deleteTag(cat,tag){
   tags[cat]=(tags[cat]||[]).filter(t=>t!==tag);
@@ -807,19 +935,42 @@ function renderToday(){
 }
 
 // ── Briefing ──────────────────────────────────────────────────────────────────
-async function generateBriefing(){
+function checkAutoBrief(){
+  if(!apiKey) return;
+  if(localStorage.getItem('pa-brief-date')===todayStr){
+    // Already generated today — restore cached text
+    const cached=localStorage.getItem('pa-brief-text');
+    if(cached){
+      document.getElementById('briefing-content').innerHTML=`<div class="briefing-content">${cached}</div>`;
+      document.getElementById('briefing-btn').textContent='Refresh';
+    }
+    return;
+  }
+  generateBriefing(true);
+}
+
+async function generateBriefing(auto=false){
   const btn=document.getElementById('briefing-btn'),content=document.getElementById('briefing-content');
-  if(!apiKey){content.innerHTML='<div class="briefing-empty">Add an API key to use AI briefings</div>';return}
-  btn.disabled=true;btn.textContent='Loading…';
-  content.innerHTML='<div class="briefing-empty">Thinking…</div>';
+  if(!apiKey){if(!auto)content.innerHTML='<div class="briefing-empty">Add an API key to use AI briefings</div>';return}
+  btn.disabled=true;btn.textContent=auto?'Briefing…':'Loading…';
+  if(!auto)content.innerHTML='<div class="briefing-empty">Thinking…</div>';
   const due=todos.filter(t=>!t.done&&t.due&&t.due<=todayStr);
   const evs=allEventsForDate(todayStr);
   const high=todos.filter(t=>!t.done&&t.priority==='high').slice(0,5);
-  const ctx=`Today: ${todayStr}\nDue/overdue: ${due.map(t=>`${t.title} (${t.priority}, ${t.category}${t.tag?'/'+t.tag:''})`).join(', ')||'None'}\nToday's events: ${evs.map(e=>`${e.title}${e.time?' at '+fmtTime(e.time):''}`).join(', ')||'None'}\nHigh priority: ${high.map(t=>`${t.title} [${t.category}]`).join(', ')||'None'}`;
+  const todayHabits=habits.map(h=>({name:h.name,done:(habitLog[todayStr]||[]).includes(h.id)}));
+  const ctx=`Today: ${todayStr}
+Due/overdue: ${due.map(t=>`${t.title} (${t.priority}, ${t.category})`).join(', ')||'None'}
+Today's events: ${evs.map(e=>`${e.title}${e.time?' at '+fmtTime(e.time):''}`).join(', ')||'None'}
+High priority tasks: ${high.map(t=>t.title).join(', ')||'None'}
+Habits today: ${todayHabits.map(h=>`${h.name} (${h.done?'✓':'○'})`).join(', ')||'None set'}`;
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a sharp personal assistant. Give a concise morning briefing in 3-4 short prose paragraphs. No bullet points. End with one clear focus recommendation.',messages:[{role:'user',content:`My day:\n${ctx}\n\nGive me a morning briefing.`}]})});
     const data=await res.json();
-    content.innerHTML=`<div class="briefing-content">${esc(data.content?.find(b=>b.type==='text')?.text||'Could not generate.')}</div>`;
+    const text=data.content?.find(b=>b.type==='text')?.text||'Could not generate.';
+    const escaped=esc(text);
+    content.innerHTML=`<div class="briefing-content">${escaped}</div>`;
+    localStorage.setItem('pa-brief-date',todayStr);
+    localStorage.setItem('pa-brief-text',escaped);
   }catch(e){content.innerHTML='<div class="briefing-empty">Error — check your API key</div>'}
   btn.disabled=false;btn.textContent='Refresh';
 }
@@ -929,18 +1080,18 @@ async function fetchAllGcalEvents(){
   const btn=document.getElementById('gcal-sync-btn');
   if(btn){btn.textContent='⟳…';btn.disabled=true}
   try{
-    // First fetch the list of all user's calendars if we haven't yet
-    if(!gcalCalendars.length){
+    // Always refresh calendar list to pick up new/removed calendars
+    {
       const r=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList',
         {headers:{Authorization:'Bearer '+gcalToken}});
       if(r.status===401){gcalToken=null;connectGoogle();return}
       const d=await r.json();
-      // Default: sync primary + all calendars the user owns
-      gcalCalendars=(d.items||[]).filter(c=>c.accessRole==='owner'||c.primary).map(c=>({
-        id:c.id, label:c.summary,
-        color:c.backgroundColor||'var(--blue)',
-        enabled:true
-      }));
+      const prev=gcalCalendars; // preserve enabled/disabled state
+      gcalCalendars=(d.items||[]).filter(c=>c.accessRole!=='none'&&!c.deleted).map(c=>{
+        const existing=prev.find(x=>x.id===c.id);
+        return {id:c.id,label:c.summary,color:c.backgroundColor||'var(--blue)',
+          enabled:existing?existing.enabled:true};
+      });
       localStorage.setItem('pa-gcal-cals',JSON.stringify(gcalCalendars));
     }
 
@@ -1033,28 +1184,77 @@ function toggleGcalCal(calId){
 }
 
 // ── Notes ─────────────────────────────────────────────────────────────────────
+function openNoteForm(){
+  if(showNoteForm) return;
+  showNoteForm=true;editingNoteId=null;
+  document.getElementById('note-form-wrap').style.display='block';
+  document.getElementById('note-save-btn').textContent='Add Note';
+  noteSelectedTags=[];noteLinkedTaskId=null;
+  renderNoteInlineTags();refreshNoteTaskDropdown();
+  document.getElementById('note-body').focus();
+}
 function toggleNoteForm(){
-  showNoteForm=!showNoteForm;
-  document.getElementById('note-form-wrap').style.display=showNoteForm?'block':'none';
   if(showNoteForm){
+    showNoteForm=false;editingNoteId=null;
+    document.getElementById('note-form-wrap').style.display='none';
+    document.getElementById('note-body').value='';
+    document.getElementById('note-title-inp').value='';
+    document.getElementById('note-save-btn').textContent='Add Note';
     noteSelectedTags=[];noteLinkedTaskId=null;
-    refreshNoteTaskDropdown();refreshNoteTagPills();
-    document.getElementById('note-title-inp').focus();
+    renderNoteInlineTags();
+  } else {
+    openNoteForm();
   }
+}
+function editNote(id){
+  const n=notes.find(x=>x.id===id);if(!n)return;
+  editingNoteId=id;showNoteForm=true;
+  document.getElementById('note-form-wrap').style.display='block';
+  document.getElementById('note-save-btn').textContent='Save Changes';
+  document.getElementById('note-title-inp').value=n.title||'';
+  document.getElementById('note-body').value=n.body;
+  noteLinkedTaskId=n.taskId||null;
+  noteSelectedTags=[...(n.tags||[])];
+  renderNoteInlineTags();refreshNoteTaskDropdown();
+  document.getElementById('note-form-wrap').scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('note-body').focus();
 }
 function addNote(){
   const body=document.getElementById('note-body').value.trim();
   if(!body){showToast('Write something first');return}
   const title=document.getElementById('note-title-inp').value.trim();
-  notes.unshift({id:uid(),title,body,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],created:todayStr,updated:todayStr});
+  if(editingNoteId){
+    notes=notes.map(n=>n.id===editingNoteId?{...n,title,body,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],updated:todayStr}:n);
+    showToast('Note updated ✓');
+  } else {
+    notes.unshift({id:uid(),title,body,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],created:todayStr,updated:todayStr});
+    showToast('Note added ✓');
+  }
   persist();
   document.getElementById('note-body').value='';
   document.getElementById('note-title-inp').value='';
   document.getElementById('note-task-link-sel').value='';
-  noteSelectedTags=[];noteLinkedTaskId=null;
+  noteSelectedTags=[];noteLinkedTaskId=null;editingNoteId=null;
   showNoteForm=false;
   document.getElementById('note-form-wrap').style.display='none';
-  renderNotes();renderTodos();renderToday();showToast('Note added ✓');
+  document.getElementById('note-save-btn').textContent='Add Note';
+  renderNoteInlineTags();
+  renderNotes();renderNoteFilterRow();renderTodos();renderToday();
+}
+// Inline tag helpers
+function renderNoteInlineTags(){
+  const el=document.getElementById('note-inline-tag-chips');if(!el)return;
+  el.innerHTML=noteSelectedTags.map(t=>`<span class="note-inline-tag">${esc(t)}<button type="button" onclick="removeNoteTagInline('${esc(t)}')">×</button></span>`).join('');
+}
+function addNoteTagInline(){
+  const inp=document.getElementById('note-tag-input');if(!inp)return;
+  const val=inp.value.trim().toLowerCase().replace(/\s+/g,'-');
+  if(!val)return;
+  if(!noteSelectedTags.includes(val))noteSelectedTags.push(val);
+  inp.value='';renderNoteInlineTags();
+}
+function removeNoteTagInline(tag){
+  noteSelectedTags=noteSelectedTags.filter(t=>t!==tag);renderNoteInlineTags();
 }
 function deleteNote(id){
   notes=notes.filter(n=>n.id!==id);
@@ -1067,43 +1267,44 @@ function toggleNoteExpand(id){
 }
 function renderNotes(){
   const list=document.getElementById('notes-list');if(!list)return;
+  const q=(document.getElementById('note-search')?.value||'').toLowerCase();
   let filtered=[...notes];
   if(noteTaskFilter){
     filtered=filtered.filter(n=>n.taskId===noteTaskFilter);
   } else if(noteFilter!=='all'){
     filtered=filtered.filter(n=>(n.tags||[]).includes(noteFilter));
   }
+  if(q){
+    filtered=filtered.filter(n=>
+      (n.title||'').toLowerCase().includes(q)||
+      (n.body||'').toLowerCase().includes(q)||
+      (n.tags||[]).some(t=>t.toLowerCase().includes(q))
+    );
+  }
   if(!filtered.length){
-    list.innerHTML='<div class="empty-state">No notes yet. Tap + to add one.</div>';return;
+    list.innerHTML='<div class="empty-state">'+(q?'No notes match your search.':'No notes yet. Tap + to add one.')+'</div>';return;
   }
   list.innerHTML=filtered.map(n=>{
     const linkedTask=n.taskId?todos.find(t=>t.id===n.taskId):null;
     const expanded=expandedNotes.has(n.id);
     const bodyClass=expanded||n.body.length<=180?'note-body':'note-body collapsed';
+    const updatedDiff=n.updated&&n.updated!==n.created?` · edited ${n.updated}`:'';
     return`<div class="note-card" id="note-${n.id}">
       <div class="note-card-header">
-        ${n.title?`<div class="note-title">${esc(n.title)}</div>`:''}
-        <button class="del-btn" onclick="deleteNote('${n.id}')">×</button>
+        ${n.title?`<div class="note-title">${esc(n.title)}</div>`:'<div style="flex:1"></div>'}
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+          <button class="edit-btn" onclick="editNote('${n.id}')" title="Edit">✏</button>
+          <button class="del-btn" onclick="deleteNote('${n.id}')">×</button>
+        </div>
       </div>
       <div class="${bodyClass}" onclick="toggleNoteExpand('${n.id}')">${esc(n.body)}</div>
       <div class="note-meta">
         ${linkedTask?`<span class="note-task-link" onclick="focusTask('${linkedTask.id}',event)">📋 ${esc(linkedTask.title.slice(0,28))}${linkedTask.title.length>28?'…':''}</span>`:''}
         ${(n.tags||[]).map(t=>`<span class="tag-badge">${esc(t)}</span>`).join('')}
-        <span class="note-date">${n.created}</span>
+        <span class="note-date">${n.created}${updatedDiff}</span>
       </div>
     </div>`;
   }).join('');
-}
-function refreshNoteTagPills(){
-  const el=document.getElementById('note-tag-pills');if(!el)return;
-  const all=allTagsList();
-  el.innerHTML=all.length?all.map(t=>`<button class="tag-pick-pill ${noteSelectedTags.includes(t)?'sel':''}" onclick="toggleNoteTag('${t}')">${esc(t)}</button>`).join(''):'<span style="font-size:12px;color:var(--muted)">Add tags via Manage Tags below</span>';
-}
-function toggleNoteTag(tag){
-  const idx=noteSelectedTags.indexOf(tag);
-  if(idx>=0)noteSelectedTags.splice(idx,1);
-  else noteSelectedTags.push(tag);
-  refreshNoteTagPills();
 }
 function refreshNoteTaskDropdown(){
   const sel=document.getElementById('note-task-link-sel');if(!sel)return;
@@ -1113,7 +1314,7 @@ function refreshNoteTaskDropdown(){
 }
 function renderNoteFilterRow(){
   const row=document.getElementById('note-filter-row');if(!row)return;
-  const all=allTagsList();
+  const all=[...new Set(notes.flatMap(n=>n.tags||[]))].sort();
   row.innerHTML=all.length?all.map(t=>`<button class="filter-btn ${noteFilter===t&&!noteTaskFilter?'active':''}" onclick="setNoteFilter('${t}',this)">${esc(t)}</button>`).join(''):'';
 }
 function setNoteFilter(f,btn){
@@ -1208,6 +1409,186 @@ IMPORTANT: Always return valid JSON only. Never return plain text. The reply fie
     chatHistory.push({role:'assistant',content:'Something went wrong. Please try again.'});
   }
   isSending=false;renderChat();
+}
+
+// ── Habits ────────────────────────────────────────────────────────────────────
+let habitFormOpen=false;
+function toggleHabitForm(){
+  habitFormOpen=!habitFormOpen;
+  const f=document.getElementById('habit-add-form');
+  f.style.display=habitFormOpen?'block':'none';
+  if(habitFormOpen) setTimeout(()=>document.getElementById('habit-name-inp').focus(),60);
+}
+function addHabit(){
+  const name=document.getElementById('habit-name-inp').value.trim();
+  if(!name){showToast('Enter a habit name');return}
+  const emoji=document.getElementById('habit-emoji-inp').value.trim()||'✓';
+  habits.push({id:uid(),name,emoji});
+  persist();
+  document.getElementById('habit-name-inp').value='';
+  document.getElementById('habit-emoji-inp').value='';
+  habitFormOpen=false;
+  document.getElementById('habit-add-form').style.display='none';
+  renderHabits();showToast('Habit added ✓');
+}
+function deleteHabit(id){
+  habits=habits.filter(h=>h.id!==id);persist();renderHabits();
+}
+function toggleHabit(id){
+  if(!habitLog[todayStr]) habitLog[todayStr]=[];
+  const idx=habitLog[todayStr].indexOf(id);
+  if(idx>=0) habitLog[todayStr].splice(idx,1);
+  else habitLog[todayStr].push(id);
+  persist();renderHabits();
+}
+function getStreak(habitId){
+  let streak=0;
+  const d=new Date(today);d.setDate(d.getDate()-1);
+  for(let i=0;i<365;i++){
+    const ds=d.toISOString().slice(0,10);
+    if((habitLog[ds]||[]).includes(habitId)){streak++;d.setDate(d.getDate()-1)}
+    else break;
+  }
+  return streak;
+}
+function renderHabits(){
+  const list=document.getElementById('habits-list');if(!list)return;
+  if(!habits.length){
+    list.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0 14px">No habits yet — tap + to add one.</div>';return;
+  }
+  const checked=habitLog[todayStr]||[];
+  const total=habits.length,done=habits.filter(h=>checked.includes(h.id)).length;
+  list.innerHTML=habits.map(h=>{
+    const isDone=checked.includes(h.id);
+    const streak=getStreak(h.id);
+    return`<div class="habit-card">
+      <button class="habit-check${isDone?' done':''}" onclick="toggleHabit('${h.id}')">${isDone?'✓':''}</button>
+      <div class="habit-emoji">${h.emoji}</div>
+      <div class="habit-info">
+        <div class="habit-name" style="${isDone?'text-decoration:line-through;color:var(--muted)':''}">${esc(h.name)}</div>
+        <div class="habit-streak">${streak>0?`🔥 ${streak} day streak`:'Start today!'}</div>
+      </div>
+      <button class="del-btn" onclick="deleteHabit('${h.id}')">×</button>
+    </div>`;
+  }).join('')+`<div style="font-size:12px;color:var(--muted);text-align:right;margin-bottom:4px">${done}/${total} today</div>`;
+}
+
+// ── People ────────────────────────────────────────────────────────────────────
+let peopleFilter='all',showPersonForm=false,expandedPeople=new Set();
+function togglePersonForm(){
+  showPersonForm=!showPersonForm;
+  document.getElementById('person-form-wrap').style.display=showPersonForm?'block':'none';
+  if(showPersonForm) setTimeout(()=>document.getElementById('pf-name').focus(),60);
+}
+function addPerson(){
+  const name=document.getElementById('pf-name').value.trim();
+  if(!name){showToast('Enter a name');return}
+  const emoji=document.getElementById('pf-emoji').value.trim();
+  const company=document.getElementById('pf-company').value.trim();
+  const rel=document.getElementById('pf-rel').value;
+  people.unshift({id:uid(),name,emoji,company,relationship:rel,log:[]});
+  persist();
+  document.getElementById('pf-name').value='';
+  document.getElementById('pf-emoji').value='';
+  document.getElementById('pf-company').value='';
+  showPersonForm=false;
+  document.getElementById('person-form-wrap').style.display='none';
+  renderPeople();showToast('Person added ✓');
+}
+function deletePerson(id,e){
+  if(e)e.stopPropagation();
+  people=people.filter(p=>p.id!==id);
+  expandedPeople.delete(id);
+  persist();renderPeople();
+}
+function togglePersonExpand(id){
+  if(expandedPeople.has(id))expandedPeople.delete(id);
+  else expandedPeople.add(id);
+  renderPeople();
+}
+function addPersonNote(personId){
+  const inp=document.getElementById('pnote-'+personId);if(!inp)return;
+  const text=inp.value.trim();if(!text){showToast('Write something first');return}
+  people=people.map(p=>p.id===personId?{...p,log:[{id:uid(),date:todayStr,text},...(p.log||[])]}:p);
+  persist();renderPeople();
+}
+function setPeopleFilter(f,btn){
+  peopleFilter=f;
+  document.querySelectorAll('#people-filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderPeople();
+}
+function relStyle(rel){
+  const c=rel==='work'?'var(--blue)':rel==='friend'?'var(--purple)':rel==='family'?'var(--success)':rel==='investor'?'var(--accent)':'var(--muted)';
+  return`background:${c}22;color:${c}`;
+}
+function renderPeople(){
+  const list=document.getElementById('people-list');if(!list)return;
+  const q=(document.getElementById('people-search')?.value||'').toLowerCase();
+  let filtered=[...people];
+  if(peopleFilter!=='all') filtered=filtered.filter(p=>p.relationship===peopleFilter);
+  if(q) filtered=filtered.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.company||'').toLowerCase().includes(q));
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state">${q||peopleFilter!=='all'?'No people match.':'No people yet.<br>Tap "+ Add Person" above.'}</div>`;return;
+  }
+  list.innerHTML=filtered.map(p=>{
+    const avatar=p.emoji||p.name.charAt(0).toUpperCase();
+    const expanded=expandedPeople.has(p.id);
+    const lastNote=(p.log||[])[0];
+    const logHtml=(p.log||[]).map(n=>`<div class="person-log-item"><div class="person-log-date">${n.date}</div><div class="person-log-text">${esc(n.text)}</div></div>`).join('');
+    return`<div class="person-card">
+      <div class="person-header" onclick="togglePersonExpand('${p.id}')">
+        <div class="person-avatar">${esc(avatar)}</div>
+        <div class="person-info">
+          <div class="person-name">${esc(p.name)}</div>
+          <div class="person-sub">${p.company?esc(p.company)+' · ':''}<span class="rel-badge" style="${relStyle(p.relationship)}">${p.relationship||'other'}</span>${lastNote?` · ${lastNote.date}`:''}</div>
+        </div>
+        <button class="del-btn" onclick="deletePerson('${p.id}',event)">×</button>
+      </div>
+      <div class="person-expand${expanded?' open':''}">
+        ${logHtml||'<div style="font-size:13px;color:var(--muted);padding:4px 0">No notes yet.</div>'}
+        <div class="person-add-note">
+          <input type="text" id="pnote-${p.id}" placeholder="Add note…" autocomplete="off" onkeydown="if(event.key==='Enter')addPersonNote('${p.id}')">
+          <button onclick="addPersonNote('${p.id}')">Add</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Auto Backup ───────────────────────────────────────────────────────────────
+function autoBackup(){
+  // Save daily snapshot (overwrites today's — always reflects latest state)
+  const snapshot=JSON.stringify({todos,events,tags,notes,habits,habitLog,people,gcalEvs,exported:new Date().toISOString()});
+  localStorage.setItem('pa-backup-'+todayStr,snapshot);
+  // Prune backups older than 8 days
+  for(let i=8;i<=30;i++){const d=new Date(today);d.setDate(d.getDate()-i);localStorage.removeItem('pa-backup-'+d.toISOString().slice(0,10))}
+}
+function checkBackupReminder(){
+  const last=localStorage.getItem('pa-backup-last-action');
+  const daysSince=last?Math.floor((Date.now()-new Date(last).getTime())/(864e5)):999;
+  if(daysSince>=7) setTimeout(()=>document.getElementById('backup-modal').style.display='flex',3000);
+}
+async function shareBackup(){
+  const snapshot=JSON.stringify({todos,events,tags,notes,habits,habitLog,people,exported:new Date().toISOString()},null,2);
+  const filename=`personal-agent-backup-${todayStr}.json`;
+  const file=new File([snapshot],filename,{type:'application/json'});
+  localStorage.setItem('pa-backup-last-action',new Date().toISOString());
+  document.getElementById('backup-modal').style.display='none';
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:'Personal Agent Backup',text:`Backup from ${todayStr}`});showToast('Backup shared ✓');return}
+    catch(e){if(e.name==='AbortError'){showToast('Cancelled');return}}
+  }
+  // Fallback: download
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([snapshot],{type:'application/json'}));
+  a.download=filename;a.click();
+  showToast('Backup downloaded ✓');
+}
+function dismissBackup(){
+  // Snooze for 3 days
+  const d=new Date();d.setDate(d.getDate()-4);
+  localStorage.setItem('pa-backup-last-action',d.toISOString());
+  document.getElementById('backup-modal').style.display='none';
 }
 </script>
 </body>
