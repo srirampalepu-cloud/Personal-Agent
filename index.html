@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Agent">
 <title>Personal Agent</title>
-<script src="https://accounts.google.com/gsi/client" async></script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -381,17 +381,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         </div>
         <div class="gcal-setup" id="gcal-setup" style="display:none">
           <div class="gcal-setup-note">
-            <strong>Step 1 — Create a Client ID:</strong><br>
-            Go to <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → New Project → Enable <em>Google Calendar API</em> → Credentials → Create OAuth 2.0 Client ID (Web application) → add <code style="background:var(--surface);padding:1px 5px;border-radius:4px">http://localhost:8080</code> as Authorized JavaScript Origin.
+            <strong>Step 1 — Add Authorized Redirect URIs:</strong><br>
+            In <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">Google Cloud Console</a> → Credentials → your OAuth 2.0 Client ID → Edit → under <em>Authorized redirect URIs</em> add both:<br>
+            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px">http://localhost:8080/</code><br>
+            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px">https://YOUR-GITHUB-PAGES-URL/</code>
           </div>
           <div class="gcal-setup-note" style="margin-top:8px">
-            <strong>Step 2 — Serve locally:</strong><br>
-            Open Terminal in this file's folder and run:<br>
-            <code style="background:var(--surface);padding:3px 8px;border-radius:6px;display:inline-block;margin-top:4px">python3 -m http.server 8080</code><br>
-            Then open <a href="http://localhost:8080" target="_blank" style="color:var(--blue)">http://localhost:8080</a> in your browser.
-          </div>
-          <div class="gcal-setup-note" style="margin-top:8px">
-            <strong>Step 3 — Paste your Client ID:</strong>
+            <strong>Step 2 — Paste your Client ID:</strong>
           </div>
           <input type="text" class="gcal-ics-input" id="gcal-client-id-input" placeholder="xxxxxxxxx.apps.googleusercontent.com" autocomplete="off">
           <div class="form-btns">
@@ -571,7 +567,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   processDailyRecurring();
   updateMeta();renderToday();renderTodos();renderCalendar();renderChat();
   renderNotes();renderNoteFilterRow();updateGcalStatus();
-  initGoogleAuth(); // init token client silently if client ID already saved
+  checkGcalRedirect(); // handle OAuth redirect response if returning from Google
   const inp=document.getElementById('chat-input');
   inp.addEventListener('input',()=>{
     document.getElementById('send-btn').disabled=!inp.value.trim()||isSending;
@@ -865,10 +861,33 @@ function addEventManual(){
 }
 function deleteEvent(id){events=events.filter(e=>e.id!==id);persist();updateMeta();renderCalendar();renderToday()}
 
-// ── Google Calendar OAuth ─────────────────────────────────────────────────────
-let gcalSetupOpen=false,gcalToken=null,gcalTokenExpiry=0,gcalTokenClient=null;
+// ── Google Calendar OAuth (redirect flow — works on iOS PWA) ──────────────────
+let gcalSetupOpen=false,gcalToken=null,gcalTokenExpiry=0;
 // Calendars to sync: array of {id, label, color}
 let gcalCalendars=JSON.parse(localStorage.getItem('pa-gcal-cals')||'[]');
+
+function getGcalRedirectUri(){
+  // Normalize: strip index.html, ensure trailing slash
+  return (window.location.origin+window.location.pathname)
+    .replace(/\/index\.html$/,'/')
+    .replace(/([^/])$/,'$1/');
+}
+
+// Called on load — reads OAuth token from URL hash after Google redirect
+function checkGcalRedirect(){
+  const hash=window.location.hash;
+  if(!hash.includes('access_token')) return;
+  const params=new URLSearchParams(hash.slice(1));
+  const token=params.get('access_token');
+  const expiresIn=parseInt(params.get('expires_in')||'3600');
+  if(token){
+    gcalToken=token;
+    gcalTokenExpiry=Date.now()+(expiresIn-60)*1000;
+    // Clean the token from the URL so it's not visible or bookmarked
+    history.replaceState(null,'',window.location.pathname+window.location.search);
+    fetchAllGcalEvents();
+  }
+}
 
 function toggleGcalSetup(){
   gcalSetupOpen=!gcalSetupOpen;
@@ -887,52 +906,26 @@ function saveGcalClientId(){
   localStorage.setItem('pa-gcal-client-id',val);
   gcalSetupOpen=false;
   document.getElementById('gcal-setup').style.display='none';
-  gcalTokenClient=null; // force re-init
   connectGoogle();
 }
 
-function initGoogleAuth(cb){
-  const clientId=localStorage.getItem('pa-gcal-client-id');
-  if(!clientId) return;
-  if(!window.google?.accounts?.oauth2){
-    setTimeout(()=>initGoogleAuth(cb),600); return;
-  }
-  gcalTokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:clientId,
-    scope:'https://www.googleapis.com/auth/calendar.readonly',
-    callback:(resp)=>{
-      if(resp.error){showToast('Auth failed: '+resp.error);return}
-      gcalToken=resp.access_token;
-      gcalTokenExpiry=Date.now()+(resp.expires_in-60)*1000;
-      if(cb) cb(); else fetchAllGcalEvents();
-    }
-  });
-  if(cb===undefined) updateGcalStatus(); // init on load, no auto-fetch
-}
-
 function connectGoogle(){
-  if(window.location.protocol==='file:'){
-    showToast('Serve from localhost — see setup instructions');
-    toggleGcalSetup();return;
-  }
   const clientId=localStorage.getItem('pa-gcal-client-id');
   if(!clientId){toggleGcalSetup();return}
-  if(!gcalTokenClient) {
-    initGoogleAuth(()=>requestGcalToken());
-    return;
-  }
-  requestGcalToken();
-}
-
-function requestGcalToken(){
-  if(gcalToken&&Date.now()<gcalTokenExpiry){
-    fetchAllGcalEvents();
-  } else {
-    gcalTokenClient.requestAccessToken({prompt:gcalToken?'':'consent'});
-  }
+  // If token still valid, just sync
+  if(gcalToken&&Date.now()<gcalTokenExpiry){fetchAllGcalEvents();return}
+  // Redirect to Google OAuth — works on all browsers including iOS PWA
+  const url=new URL('https://accounts.google.com/o/oauth2/v2/auth');
+  url.searchParams.set('client_id',clientId);
+  url.searchParams.set('redirect_uri',getGcalRedirectUri());
+  url.searchParams.set('response_type','token');
+  url.searchParams.set('scope','https://www.googleapis.com/auth/calendar.readonly');
+  url.searchParams.set('include_granted_scopes','true');
+  window.location.href=url.toString();
 }
 
 async function fetchAllGcalEvents(){
+  if(!gcalToken||Date.now()>=gcalTokenExpiry){connectGoogle();return}
   const btn=document.getElementById('gcal-sync-btn');
   if(btn){btn.textContent='⟳…';btn.disabled=true}
   try{
@@ -940,7 +933,7 @@ async function fetchAllGcalEvents(){
     if(!gcalCalendars.length){
       const r=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList',
         {headers:{Authorization:'Bearer '+gcalToken}});
-      if(r.status===401){gcalToken=null;requestGcalToken();return}
+      if(r.status===401){gcalToken=null;connectGoogle();return}
       const d=await r.json();
       // Default: sync primary + all calendars the user owns
       gcalCalendars=(d.items||[]).filter(c=>c.accessRole==='owner'||c.primary).map(c=>({
