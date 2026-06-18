@@ -157,24 +157,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .habit-name{font-size:14px;font-weight:600}
 .habit-streak{font-size:12px;color:var(--muted);margin-top:2px}
 
-/* People */
-.person-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:8px}
-.person-header{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.person-avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
-.person-info{flex:1;min-width:0}
-.person-name{font-size:15px;font-weight:700}
-.person-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.person-expand{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-.person-expand.open{display:block}
-.person-log-item{font-size:13px;padding:7px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start}
-.person-log-date{font-size:11px;color:var(--muted);flex-shrink:0;padding-top:1px;min-width:52px}
-.person-log-text{flex:1;line-height:1.5}
-.person-add-note{display:flex;gap:6px;margin-top:8px}
-.person-add-note input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;font-family:inherit}
-.person-add-note input:focus{border-color:var(--accent)}
-.person-add-note button{background:var(--accent);color:#111;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.rel-badge{font-size:10px;font-weight:700;border-radius:20px;padding:2px 8px}
-
 /* Backup modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:450;display:flex;align-items:flex-end;justify-content:center;padding:0 0 env(safe-area-inset-bottom,0)}
 .modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:28px 24px 32px;width:100%;max-width:480px;border:1px solid var(--border);border-bottom:none}
@@ -489,6 +471,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
             <option value="">No task linked</option>
           </select>
           <div style="margin-top:10px">
+            <input type="text" id="note-person-inp" placeholder="👤 Person (optional)…" autocomplete="off"
+              style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;font-family:inherit;margin-bottom:10px;box-sizing:border-box"
+              onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+          </div>
+          <div style="margin-top:2px">
             <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Tags</div>
             <div id="note-inline-tag-chips" style="display:flex;flex-wrap:wrap;gap:5px;min-height:4px;margin-bottom:7px"></div>
             <div style="display:flex;gap:6px">
@@ -526,41 +513,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
     </div>
 
-    <!-- PEOPLE -->
-    <div class="panel" id="panel-people">
-      <input class="note-search" id="people-search" placeholder="🔍  Search people…" oninput="renderPeople()" autocomplete="off">
-      <div class="filter-row" id="people-filter-row">
-        <button class="filter-btn active" onclick="setPeopleFilter('all',this)">All</button>
-        <button class="filter-btn" onclick="setPeopleFilter('work',this)">Work</button>
-        <button class="filter-btn" onclick="setPeopleFilter('friend',this)">Friend</button>
-        <button class="filter-btn" onclick="setPeopleFilter('family',this)">Family</button>
-        <button class="filter-btn" onclick="setPeopleFilter('investor',this)">Investor</button>
-      </div>
-      <!-- Add person form -->
-      <div id="person-form-wrap" style="display:none">
-        <div class="task-form">
-          <div style="display:flex;gap:8px;margin-bottom:10px">
-            <input type="text" id="pf-emoji" placeholder="😊" maxlength="2" style="width:52px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:20px;text-align:center;outline:none;font-family:inherit">
-            <input type="text" id="pf-name" placeholder="Name" autocomplete="off" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;outline:none;font-family:inherit">
-          </div>
-          <input type="text" id="pf-company" placeholder="Company / org (optional)" autocomplete="off" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;outline:none;font-family:inherit;margin-bottom:8px;box-sizing:border-box">
-          <select id="pf-rel" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:14px;outline:none">
-            <option value="work">Work</option>
-            <option value="friend">Friend</option>
-            <option value="family">Family</option>
-            <option value="investor">Investor</option>
-            <option value="other">Other</option>
-          </select>
-          <div class="form-btns" style="margin-top:10px">
-            <button class="form-btn secondary" onclick="togglePersonForm()">Cancel</button>
-            <button class="form-btn primary" onclick="addPerson()">Add Person</button>
-          </div>
-        </div>
-      </div>
-      <button onclick="togglePersonForm()" style="width:100%;background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:13px;color:var(--muted);font-size:14px;cursor:pointer;margin-bottom:12px;-webkit-tap-highlight-color:transparent;font-family:inherit">+ Add Person</button>
-      <div id="people-list"></div>
-    </div>
-
     <!-- CHAT -->
     <div class="panel" id="panel-chat">
       <div id="chat-messages"></div>
@@ -586,10 +538,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <button class="tab-btn" id="tab-calendar" onclick="switchTab('calendar')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Calendar
-    </button>
-    <button class="tab-btn" id="tab-people" onclick="switchTab('people')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      People
     </button>
     <button class="tab-btn" id="tab-notes" onclick="switchTab('notes')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
@@ -665,9 +613,8 @@ let notes   = JSON.parse(localStorage.getItem('pa-notes')||'[]');
 let gcalEvs = JSON.parse(localStorage.getItem('pa-gcal-events')||'[]');
 let habits  = JSON.parse(localStorage.getItem('pa-habits')||'[]');
 let habitLog= JSON.parse(localStorage.getItem('pa-habit-log')||'{}');
-let people  = JSON.parse(localStorage.getItem('pa-people')||'[]');
 let apiKey  = localStorage.getItem('pa-apikey')||'';
-let chatHistory=[{role:'assistant',content:'Hi! I\'m your personal agent.\n\nTry:\n• "Add high priority work task: due diligence review by Friday"\n• "Add investing task: review portfolio returns"\n• "Schedule call June 25 at 4pm"\n• "What should I focus on today?"'}];
+let chatHistory=[{role:'assistant',content:'Hi! I\'m your personal agent. I can see your tasks and notes.\n\nTry:\n• "Find my notes about [topic]"\n• "What do I know about [person]?" (if tagged in a note)\n• "Add high priority task: …"\n• "What should I focus on today?"\n• "Search my notes for anything about fundraising"'}];
 let currentFilter='all',currentTagFilter=null,currentMode='all',currentTab='today';
 let calState={year:today.getFullYear(),month:today.getMonth()},selectedDay=todayStr;
 let isSending=false,showTaskForm=false,selectedCat='work',selectedTag=null;
@@ -681,7 +628,6 @@ function persist(){
   localStorage.setItem('pa-notes',JSON.stringify(notes));
   localStorage.setItem('pa-habits',JSON.stringify(habits));
   localStorage.setItem('pa-habit-log',JSON.stringify(habitLog));
-  localStorage.setItem('pa-people',JSON.stringify(people));
   autoBackup();
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
@@ -691,7 +637,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   processDailyRecurring();
   updateMeta();renderToday();renderTodos();renderCalendar();renderChat();
   renderNotes();renderNoteFilterRow();updateGcalStatus();
-  renderHabits();renderPeople();
+  renderHabits();
   checkGcalRedirect();
   checkAutoBrief();
   checkBackupReminder();
@@ -733,7 +679,7 @@ function showToast(msg){
 
 function switchTab(tab){
   currentTab=tab;
-  ['today','tasks','calendar','people','notes','chat'].forEach(t=>{
+  ['today','tasks','calendar','notes','chat'].forEach(t=>{
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
   });
@@ -748,7 +694,6 @@ function switchTab(tab){
   if(tab==='tasks'){renderTodos();refreshTagPills();renderTagFilterRow()}
   if(tab==='today'){renderToday();checkAutoBrief()}
   if(tab==='notes'){renderNotes();renderNoteFilterRow();renderNoteTaskChip();refreshNoteTaskDropdown()}
-  if(tab==='people') renderPeople();
 }
 
 // ── Tags ──────────────────────────────────────────────────────────────────────
@@ -1199,6 +1144,7 @@ function toggleNoteForm(){
     document.getElementById('note-form-wrap').style.display='none';
     document.getElementById('note-body').value='';
     document.getElementById('note-title-inp').value='';
+    document.getElementById('note-person-inp').value='';
     document.getElementById('note-save-btn').textContent='Add Note';
     noteSelectedTags=[];noteLinkedTaskId=null;
     renderNoteInlineTags();
@@ -1213,6 +1159,7 @@ function editNote(id){
   document.getElementById('note-save-btn').textContent='Save Changes';
   document.getElementById('note-title-inp').value=n.title||'';
   document.getElementById('note-body').value=n.body;
+  document.getElementById('note-person-inp').value=n.person||'';
   noteLinkedTaskId=n.taskId||null;
   noteSelectedTags=[...(n.tags||[])];
   renderNoteInlineTags();refreshNoteTaskDropdown();
@@ -1223,16 +1170,18 @@ function addNote(){
   const body=document.getElementById('note-body').value.trim();
   if(!body){showToast('Write something first');return}
   const title=document.getElementById('note-title-inp').value.trim();
+  const person=document.getElementById('note-person-inp').value.trim()||null;
   if(editingNoteId){
-    notes=notes.map(n=>n.id===editingNoteId?{...n,title,body,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],updated:todayStr}:n);
+    notes=notes.map(n=>n.id===editingNoteId?{...n,title,body,person,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],updated:todayStr}:n);
     showToast('Note updated ✓');
   } else {
-    notes.unshift({id:uid(),title,body,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],created:todayStr,updated:todayStr});
+    notes.unshift({id:uid(),title,body,person,taskId:noteLinkedTaskId,tags:[...noteSelectedTags],created:todayStr,updated:todayStr});
     showToast('Note added ✓');
   }
   persist();
   document.getElementById('note-body').value='';
   document.getElementById('note-title-inp').value='';
+  document.getElementById('note-person-inp').value='';
   document.getElementById('note-task-link-sel').value='';
   noteSelectedTags=[];noteLinkedTaskId=null;editingNoteId=null;
   showNoteForm=false;
@@ -1278,7 +1227,8 @@ function renderNotes(){
     filtered=filtered.filter(n=>
       (n.title||'').toLowerCase().includes(q)||
       (n.body||'').toLowerCase().includes(q)||
-      (n.tags||[]).some(t=>t.toLowerCase().includes(q))
+      (n.tags||[]).some(t=>t.toLowerCase().includes(q))||
+      (n.person||'').toLowerCase().includes(q)
     );
   }
   if(!filtered.length){
@@ -1300,6 +1250,7 @@ function renderNotes(){
       <div class="${bodyClass}" onclick="toggleNoteExpand('${n.id}')">${esc(n.body)}</div>
       <div class="note-meta">
         ${linkedTask?`<span class="note-task-link" onclick="focusTask('${linkedTask.id}',event)">📋 ${esc(linkedTask.title.slice(0,28))}${linkedTask.title.length>28?'…':''}</span>`:''}
+        ${n.person?`<span class="tag-badge" style="background:var(--surface);color:var(--muted)">👤 ${esc(n.person)}</span>`:''}
         ${(n.tags||[]).map(t=>`<span class="tag-badge">${esc(t)}</span>`).join('')}
         <span class="note-date">${n.created}${updatedDiff}</span>
       </div>
@@ -1363,26 +1314,35 @@ async function sendChat(){
   renderChat();
   try{
     const allCatTags=Object.entries(tags).map(([c,ts])=>`${c}: ${ts.join(', ')||'none'}`).join(' | ');
+    // Build data context for Claude
+    const notesCtx=notes.slice(0,60).map(n=>`[Note id:${n.id}] ${n.title?`"${n.title}" `:''}(${n.created}${n.tags?.length?' #'+n.tags.join(' #'):''}${n.person?' 👤'+n.person:''}) — ${n.body.slice(0,300)}${n.body.length>300?'…':''}`).join('\n');
+    const todosCtx=todos.filter(t=>!t.done).slice(0,40).map(t=>`[${t.priority}] ${t.title} [${t.category}${t.tag?'/'+t.tag:''}]${t.due?' due:'+t.due:''}`).join('\n');
     const msgs=chatHistory.slice(0,-1).filter(m=>!(m.role==='assistant'&&m.content==='…')).map(m=>({role:m.role,content:m.content}));
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-6',max_tokens:800,
-        system:`You are a friendly personal assistant. You help manage tasks and events.
+        model:'claude-sonnet-4-6',max_tokens:1000,
+        system:`You are a personal assistant with full access to the user's data. Today: ${todayStr}
 
-When the user wants to add a task or event, respond with ONLY this JSON (no other text):
-{"action":"add_todo","todo":{"title":"...","priority":"high|medium|low","category":"work|personal|investing","tag":null,"due":"YYYY-MM-DD or null","recurring":"daily|weekly or null"},"reply":"Your friendly confirmation message"}
+=== NOTES (${notes.length} total) ===
+${notesCtx||'None'}
 
-For events:
-{"action":"add_event","event":{"title":"...","date":"YYYY-MM-DD","time":"HH:MM or null","note":"... or null"},"reply":"Your friendly confirmation message"}
+=== ACTIVE TASKS (${todos.filter(t=>!t.done).length} total) ===
+${todosCtx||'None'}
 
-For all other messages (questions, advice, chat), respond with ONLY:
-{"action":"chat","reply":"Your helpful response here"}
+Available task tags: ${allCatTags}
 
-Available tags: ${allCatTags}
-Today: ${todayStr}
-IMPORTANT: Always return valid JSON only. Never return plain text. The reply field should be natural and conversational.`,
+Notes can have an optional 👤 person field — use it to find notes about specific people.
+
+You can search, summarize, and answer questions about any of the above data. Always respond with ONLY valid JSON in one of these formats:
+
+Add task: {"action":"add_todo","todo":{"title":"...","priority":"high|medium|low","category":"work|personal|investing","tag":null,"due":"YYYY-MM-DD or null","recurring":"daily|weekly or null"},"reply":"..."}
+Add event: {"action":"add_event","event":{"title":"...","date":"YYYY-MM-DD","time":"HH:MM or null","note":"... or null"},"reply":"..."}
+Navigate + search (when user wants to find/show notes): {"action":"navigate","tab":"notes","filter":"search term","reply":"..."}
+All other responses: {"action":"chat","reply":"..."}
+
+IMPORTANT: Always return valid JSON only. The reply field should be natural and conversational. When answering questions about notes or tasks, include the relevant content in the reply.`,
         messages:msgs
       })
     });
@@ -1402,6 +1362,15 @@ IMPORTANT: Always return valid JSON only. Never return plain text. The reply fie
     if(result.action==='add_event'&&result.event){
       events.push({id:uid(),...result.event});
       persist();updateMeta();renderToday();renderCalendar();showToast('Event added ✓');
+    }
+    if(result.action==='navigate'&&result.tab){
+      setTimeout(()=>{
+        switchTab(result.tab);
+        if(result.tab==='notes'&&result.filter){
+          const s=document.getElementById('note-search');
+          if(s){s.value=result.filter;renderNotes();}
+        }
+      },400);
     }
     chatHistory.push({role:'assistant',content:result.reply||'Done!'});
   }catch(e){
@@ -1473,92 +1442,10 @@ function renderHabits(){
   }).join('')+`<div style="font-size:12px;color:var(--muted);text-align:right;margin-bottom:4px">${done}/${total} today</div>`;
 }
 
-// ── People ────────────────────────────────────────────────────────────────────
-let peopleFilter='all',showPersonForm=false,expandedPeople=new Set();
-function togglePersonForm(){
-  showPersonForm=!showPersonForm;
-  document.getElementById('person-form-wrap').style.display=showPersonForm?'block':'none';
-  if(showPersonForm) setTimeout(()=>document.getElementById('pf-name').focus(),60);
-}
-function addPerson(){
-  const name=document.getElementById('pf-name').value.trim();
-  if(!name){showToast('Enter a name');return}
-  const emoji=document.getElementById('pf-emoji').value.trim();
-  const company=document.getElementById('pf-company').value.trim();
-  const rel=document.getElementById('pf-rel').value;
-  people.unshift({id:uid(),name,emoji,company,relationship:rel,log:[]});
-  persist();
-  document.getElementById('pf-name').value='';
-  document.getElementById('pf-emoji').value='';
-  document.getElementById('pf-company').value='';
-  showPersonForm=false;
-  document.getElementById('person-form-wrap').style.display='none';
-  renderPeople();showToast('Person added ✓');
-}
-function deletePerson(id,e){
-  if(e)e.stopPropagation();
-  people=people.filter(p=>p.id!==id);
-  expandedPeople.delete(id);
-  persist();renderPeople();
-}
-function togglePersonExpand(id){
-  if(expandedPeople.has(id))expandedPeople.delete(id);
-  else expandedPeople.add(id);
-  renderPeople();
-}
-function addPersonNote(personId){
-  const inp=document.getElementById('pnote-'+personId);if(!inp)return;
-  const text=inp.value.trim();if(!text){showToast('Write something first');return}
-  people=people.map(p=>p.id===personId?{...p,log:[{id:uid(),date:todayStr,text},...(p.log||[])]}:p);
-  persist();renderPeople();
-}
-function setPeopleFilter(f,btn){
-  peopleFilter=f;
-  document.querySelectorAll('#people-filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');renderPeople();
-}
-function relStyle(rel){
-  const c=rel==='work'?'var(--blue)':rel==='friend'?'var(--purple)':rel==='family'?'var(--success)':rel==='investor'?'var(--accent)':'var(--muted)';
-  return`background:${c}22;color:${c}`;
-}
-function renderPeople(){
-  const list=document.getElementById('people-list');if(!list)return;
-  const q=(document.getElementById('people-search')?.value||'').toLowerCase();
-  let filtered=[...people];
-  if(peopleFilter!=='all') filtered=filtered.filter(p=>p.relationship===peopleFilter);
-  if(q) filtered=filtered.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.company||'').toLowerCase().includes(q));
-  if(!filtered.length){
-    list.innerHTML=`<div class="empty-state">${q||peopleFilter!=='all'?'No people match.':'No people yet.<br>Tap "+ Add Person" above.'}</div>`;return;
-  }
-  list.innerHTML=filtered.map(p=>{
-    const avatar=p.emoji||p.name.charAt(0).toUpperCase();
-    const expanded=expandedPeople.has(p.id);
-    const lastNote=(p.log||[])[0];
-    const logHtml=(p.log||[]).map(n=>`<div class="person-log-item"><div class="person-log-date">${n.date}</div><div class="person-log-text">${esc(n.text)}</div></div>`).join('');
-    return`<div class="person-card">
-      <div class="person-header" onclick="togglePersonExpand('${p.id}')">
-        <div class="person-avatar">${esc(avatar)}</div>
-        <div class="person-info">
-          <div class="person-name">${esc(p.name)}</div>
-          <div class="person-sub">${p.company?esc(p.company)+' · ':''}<span class="rel-badge" style="${relStyle(p.relationship)}">${p.relationship||'other'}</span>${lastNote?` · ${lastNote.date}`:''}</div>
-        </div>
-        <button class="del-btn" onclick="deletePerson('${p.id}',event)">×</button>
-      </div>
-      <div class="person-expand${expanded?' open':''}">
-        ${logHtml||'<div style="font-size:13px;color:var(--muted);padding:4px 0">No notes yet.</div>'}
-        <div class="person-add-note">
-          <input type="text" id="pnote-${p.id}" placeholder="Add note…" autocomplete="off" onkeydown="if(event.key==='Enter')addPersonNote('${p.id}')">
-          <button onclick="addPersonNote('${p.id}')">Add</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
 // ── Auto Backup ───────────────────────────────────────────────────────────────
 function autoBackup(){
   // Save daily snapshot (overwrites today's — always reflects latest state)
-  const snapshot=JSON.stringify({todos,events,tags,notes,habits,habitLog,people,gcalEvs,exported:new Date().toISOString()});
+  const snapshot=JSON.stringify({todos,events,tags,notes,habits,habitLog,gcalEvs,exported:new Date().toISOString()});
   localStorage.setItem('pa-backup-'+todayStr,snapshot);
   // Prune backups older than 8 days
   for(let i=8;i<=30;i++){const d=new Date(today);d.setDate(d.getDate()-i);localStorage.removeItem('pa-backup-'+d.toISOString().slice(0,10))}
@@ -1569,7 +1456,7 @@ function checkBackupReminder(){
   if(daysSince>=7) setTimeout(()=>document.getElementById('backup-modal').style.display='flex',3000);
 }
 async function shareBackup(){
-  const snapshot=JSON.stringify({todos,events,tags,notes,habits,habitLog,people,exported:new Date().toISOString()},null,2);
+  const snapshot=JSON.stringify({todos,events,tags,notes,habits,habitLog,exported:new Date().toISOString()},null,2);
   const filename=`personal-agent-backup-${todayStr}.json`;
   const file=new File([snapshot],filename,{type:'application/json'});
   localStorage.setItem('pa-backup-last-action',new Date().toISOString());
